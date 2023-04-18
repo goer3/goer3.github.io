@@ -1,22 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/docsify/4.12.2/themes/vue.min.css">
+  <link rel="stylesheet" href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/gitalk/1.7.2/gitalk.min.css">
+  <link rel="stylesheet" href="./assets/css/style.css">
 </head>
+
 <body>
-  <div id="app"></div>
+  <div id="app">
+  </div>
   <script>
     window.$docsify = {
-      name: '',
-      repo: ''
+      // coverpage: true, // 封面
+      // onlyCover: false, // 封面是否单独显示
+      name: '运维文档仓库', // 标题
+      repo: '',
+      // subMaxLevel: 1, // 忽略文章中侧边栏显示的标题登记，通过 <!-- {docsify-ignore} --> 可以忽略指定标题
+      loadSidebar: true,
+      // alias: {
+      //   '/.*/_sidebar.md': '/_sidebar.md'
+      // },
+      loadNavbar: true,
+      search: 'auto', // 搜索默认值
+      // 搜索配置参数
+      search: {
+        maxAge: 86400000, // 过期时间，单位毫秒，默认一天
+        paths: [], // or 'auto'
+        placeholder: '关键字搜索',
+        noData: '暂无相关数据!',
+        depth: 6, // 搜索标题的最大层级, 1 - 6
+      },
+      plugins: [
+        function (hook) {
+          var footer = [
+            '<hr/>',
+            '<footer>',
+            '<span>这是 Footer</span>',
+            '</footer>'
+          ].join('');
+
+          hook.afterEach(function (html) {
+            return html + footer;
+          });
+        }
+      ]
     }
   </script>
+  <!-- 字节跳动公共资源库 https://cdn.bytedance.com/ -->
   <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/docsify/4.12.2/docsify.min.js"></script>
+  <!-- 表情 -->
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/docsify/4.12.2/plugins/emoji.min.js"></script>
+  <!-- 搜索 -->
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/docsify/4.12.2/plugins/search.min.js"></script>
+  <!-- 图片缩放 -->
+  <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/docsify/4.12.2/plugins/zoom-image.min.js"></script>
+  <!-- 代码复制 -->
+  <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/docsify-copy-code/2.1.1/docsify-copy-code.min.js">
+  </script>
+  <!-- 代码高亮 -->
+  <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-bash.min.js"></script>
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-go.min.js"></script>
+  <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-groovy.min.js"></script>
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-yaml.min.js"></script>
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-json.min.js"></script>
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-jq.min.js"></script>
+  <!-- <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-javascript.min.js"> -->
+  </script>
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-sass.min.js"></script>
+  <!-- <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-css.min.js"></script> -->
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-less.min.js"></script>
+  <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-sql.min.js"></script>
+  <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-promql.min.js"></script>
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-python.min.js"></script>
+  <!-- 评论 -->
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/gitalk/1.7.2/gitalk.min.js"></script>
+  <script>
+    const gitalk = new Gitalk({
+      clientID: '0a7b204361e8b66aa4b4',
+      clientSecret: 'bf38595f42ee584e8952e46b4c1f60f0830c0bfe',
+      repo: 'goer3.github.io',
+      owner: 'goer3',
+      admin: ['goer3'],
+      distractionFreeMode: false,
+      id: decodeURI(window.location.pathname),
+    })
+  </script>
 </body>
+
 </html>
