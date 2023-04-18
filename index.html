@@ -80,7 +80,11 @@
   <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-promql.min.js"></script>
   <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/prism/1.27.0/components/prism-python.min.js"></script>
   <!-- 评论 -->
-  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/gitalk/1.7.2/gitalk.min.js"></script>
+  <!-- <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/gitalk/1.7.2/gitalk.min.js"></script> -->
+  <!-- <script src="//cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js"></script> -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk/dist/gitalk.css">
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/gitalk.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js"></script>
   <script>
     const gitalk = new Gitalk({
       clientID: '0a7b204361e8b66aa4b4',
@@ -89,7 +93,7 @@
       owner: 'goer3',
       admin: ['goer3'],
       distractionFreeMode: false,
-      id: decodeURI(window.location.pathname),
+      id: decodeURI(location.pathname),
     })
   </script>
 </body>
