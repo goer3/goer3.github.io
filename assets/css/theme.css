@@ -52,6 +52,7 @@ body {
 
 main {
     width: 1400px;
+    min-width: 1400px;
     top: 75px;
     display: flex;
     margin: 0 auto;
@@ -593,7 +594,6 @@ code::-webkit-scrollbar-track {
 .gitalk-container .gt-container .gt-btn span {
     color: #fff !important;
     font-size: 13px;
-    letter-spacing: 5px;
 }
 
 .gitalk-container .gt-container .gt-comment-content * {
@@ -603,4 +603,124 @@ code::-webkit-scrollbar-track {
 .gitalk-container .gt-container .gt-comment-username {
     font-weight: bolder;
     color: #c82333 !important;
+}
+
+
+/* 侧边小工具 */
+.theme-bar {
+    position: fixed;
+    right: 30px;
+    bottom: 80px;
+}
+
+.theme-bar ul li {
+    list-style: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #dddddd;
+    margin-top: 2px;
+    background-color: #fff;
+}
+
+
+.theme-bar ul li img {
+    height: 40px;
+    width: 40px;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.theme-bar-wechatcode {
+    position: fixed;
+    right: 80px;
+    bottom: 60px;
+    display: none;
+}
+
+.theme-bar-title {
+    font-size: 16px;
+    font-weight: bolder;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.theme-bar-code img {
+    width: 100px;
+    height: 100px;
+    padding: 5px;
+    border: 1px solid #ddd;
+}
+
+.theme-shade {
+    background-color: #000;
+    position: fixed;
+    top: -50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    opacity: 0.5;
+    display: none;
+}
+
+.theme-modal {
+    width: 100%;
+    max-width: 700px;
+    height: 400px;
+    background-color: #fff;
+    margin: auto;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px;
+    display: none;
+}
+
+.theme-modal .theme-modal-head {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.theme-modal .theme-modal-head .title {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.theme-modal .theme-modal-body {
+    margin-bottom: 30px;
+}
+
+.theme-modal .theme-modal-body img {
+    width: 100%;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.theme-modal-btn {
+    width: 100%;
+    color: #fff !important;
+    background-color: #0948b3 !important;
+    border-color: #0948b3;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 2px;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 3px 5px;
+    font-size: 15px;
+    border-radius: 0;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }

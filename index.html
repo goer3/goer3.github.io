@@ -24,6 +24,20 @@
 </head>
 
 <body>
+  <!-- 遮罩和提示信息 -->
+  <div id="id-Shade" class="theme-shade"></div>
+  <div id="id-Tips" class="theme-modal">
+    <div class="theme-modal-head">
+      <span class="title">关注微信公众号或加入 QQ 群，随时随地了解最新资讯！</span>
+    </div>
+    <div class="theme-modal-body">
+      <img src="./assets/images/Wxqrcode.jpg" alt="">
+    </div>
+    <div class="theme-modal-footer">
+      <button id="id-KnowBtn" class="theme-modal-btn">已知悉，今天内不再提示！</button>
+    </div>
+  </div>
+
   <nav class="theme-navbar">
     <div class="theme-header-left">
       <img class="theme-logo" src="./assets/images/logo-black.png" alt="">
@@ -172,85 +186,161 @@
   <!-- 字数统计 -->
   <script src="//unpkg.com/docsify-count/dist/countable.js"></script>
 
-</body>
-  <!-- 嵌套模块 -->
-  <!-- 用户信息 -->
-  <div id="id-userInfo">
-    <!-- GitHUB -->
-    <a href="https://github.com/goer3" target="_blank" class="theme-github-corner" aria-label="View source on Github">
-      <svg viewBox="0 0 250 250" aria-hidden="true">
-        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-        <path
-          d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
-          fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-        <path
-          d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
-          fill="currentColor" class="octo-body"></path>
-      </svg>
-    </a>
-    <!-- 头像 -->
-    <div class="theme-avatar">
-      <img src="./assets/images/avatar.png" alt="">
-    </div>
-    <!-- 名字 -->
-    <div class="theme-job">
-      <span>不知名运维工程师</span>
-    </div>
-    <!-- 联系信息 -->
-    <div class="theme-info">
-      <p dir="auto">
-        <a href="mailto:1214966109@qq.com">
-          <img
-            src="https://camo.githubusercontent.com/929f031ef6fa91e333552e951ec2da601533676da3b13fbee3e8adbac8e5bd3b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d313231343936363130394071712e636f6d2d3030366265643f7374796c653d666c61742d737175617265266c6f676f3d476d61696c266c6f676f436f6c6f723d7768697465266c696e6b3d6d61696c746f3a313231343936363130394071712e636f6d"
-            alt="QQmail"
-            data-canonical-src="https://img.shields.io/badge/-1214966109@qq.com-006bed?style=flat-square&amp;logo=Gmail&amp;logoColor=white&amp;link=mailto:1214966109@qq.com"
-            style="max-width: 100%;">
+  <div class="theme-bar">
+    <ul>
+      <li>
+        <a href="javascript:scrollTo(0,0);" class="theme-bar-btn" title="返回顶部">
+          <img src="./assets/images/top.png" alt="">
         </a>
-      </p>
-    </div>
+      </li>
+      <li>
+        <a href="/#/" class="theme-bar-btn" title="返回首页">
+          <img src="./assets/images/home.png" alt="">
+        </a>
+      </li>
+      <li>
+        <a class="theme-bar-btn" title="QQ" target="_blank"
+          href="http://wpa.qq.com/msgrd?v=3&amp;uin=1214966109&amp;site=qq&amp;menu=yes">
+          <img src="./assets/images/QQ-logo.png" alt="">
+        </a>
+      </li>
+      <li>
+        <a class="my-bar-btn" title="微信赞助" onmouseout="hideWeChatCode()" onmouseover="showWeChatCode()">
+          <img src="./assets/images/WeChat-logo.png" alt="">
+        </a>
+      </li>
+    </ul>
 
-    <div class="theme-lines"></div>
-
-    <!-- 文章信息 -->
-    <div class="theme-post-info">
-      <ul class="theme-post-ul">
-        <li>
-          <div class="theme-post-num">100</div>
-          <div class="theme-post-label-name">文章</div>
-        </li>
-        <li>
-          <div class="theme-post-num">100</div>
-          <div class="theme-post-label-name">分类</div>
-        </li>
-        <li>
-          <div class="theme-post-num">100</div>
-          <div class="theme-post-label-name">创作天数</div>
-        </li>
-        <li>
-          <div class="theme-post-num">100</div>
-          <div class="theme-post-label-name">评论</div>
-        </li>
-      </ul>
+    <div class="theme-bar-code theme-bar-wechatcode" id="wechatCode" style="display: none;">
+      <div class="theme-bar-title">微信赞助</div>
+      <img src="./assets/images/WeChatCode.png" alt="">
     </div>
   </div>
 
-  <!-- 其它模块 -->
-  <div id="id-userModule">
-    <!-- 微信公众号 -->
-    <div id="id-wechat" class="theme-sidebar-block">
-      <h3 class="theme-sidebar-block-title">微信公众号</h3>
-      <div class="theme-sidebar-block-content">
-        <img src="./assets/images/wechat.png" alt="">
-      </div>
-    </div>
+  <!-- 微信赞助 -->
+  <script>
+    function showWeChatCode() {
+      document.getElementById("wechatCode").style.display = 'block';
+    }
 
-    <!-- QQ群 -->
-    <div id="id-qqg" class="theme-sidebar-block">
-      <h3 class="theme-sidebar-block-title">技术交流群</h3>
-      <div class="theme-sidebar-block-content">
-        <img src="./assets/images/qq.png" alt="">
-      </div>
+    function hideWeChatCode() {
+      document.getElementById("wechatCode").style.display = 'none';
+    }
+  </script>
+
+  <!-- 页面遮罩 -->
+  <script>
+    (function tipTools() {
+      var shade = document.getElementById("id-Shade");
+      var tips = document.getElementById("id-Tips");
+
+      var today = new Date();
+      var day = today.getDate();
+      var month = today.getMonth() + 1;
+      var year = today.getFullYear();
+      month = month < 10 ? "0" + month : month;
+      day = day < 10 ? "0" + day : day;
+      var date = year + month + day;
+      var today_version = date;
+
+      var key = window.location.hostname + ".version";
+      var old_version = localStorage.getItem(key);
+      console.log(old_version)
+      console.log(today_version)
+
+      if (old_version != today_version) {
+        console.log(123)
+        shade.style.display = "block";
+        tips.style.display = "block";
+      }
+
+      var btn = document.getElementById("id-KnowBtn");
+      btn.onclick = function () {
+        localStorage.setItem(key, today_version);
+        shade.style.display = "none";
+        tips.style.display = "none";
+      }
+    })();
+  </script>
+</body>
+<!-- 嵌套模块 -->
+<!-- 用户信息 -->
+<div id="id-userInfo">
+  <!-- GitHUB -->
+  <a href="https://github.com/goer3" target="_blank" class="theme-github-corner" aria-label="View source on Github">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+      <path
+        d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+        fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+      <path
+        d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+        fill="currentColor" class="octo-body"></path>
+    </svg>
+  </a>
+  <!-- 头像 -->
+  <div class="theme-avatar">
+    <img src="./assets/images/avatar.png" alt="">
+  </div>
+  <!-- 名字 -->
+  <div class="theme-job">
+    <span>不知名运维工程师</span>
+  </div>
+  <!-- 联系信息 -->
+  <div class="theme-info">
+    <p dir="auto">
+      <a href="mailto:1214966109@qq.com">
+        <img
+          src="https://camo.githubusercontent.com/929f031ef6fa91e333552e951ec2da601533676da3b13fbee3e8adbac8e5bd3b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d313231343936363130394071712e636f6d2d3030366265643f7374796c653d666c61742d737175617265266c6f676f3d476d61696c266c6f676f436f6c6f723d7768697465266c696e6b3d6d61696c746f3a313231343936363130394071712e636f6d"
+          alt="QQmail"
+          data-canonical-src="https://img.shields.io/badge/-1214966109@qq.com-006bed?style=flat-square&amp;logo=Gmail&amp;logoColor=white&amp;link=mailto:1214966109@qq.com"
+          style="max-width: 100%;">
+      </a>
+    </p>
+  </div>
+
+  <div class="theme-lines"></div>
+
+  <!-- 文章信息 -->
+  <div class="theme-post-info">
+    <ul class="theme-post-ul">
+      <li>
+        <div class="theme-post-num">100</div>
+        <div class="theme-post-label-name">文章</div>
+      </li>
+      <li>
+        <div class="theme-post-num">100</div>
+        <div class="theme-post-label-name">分类</div>
+      </li>
+      <li>
+        <div class="theme-post-num">100</div>
+        <div class="theme-post-label-name">创作天数</div>
+      </li>
+      <li>
+        <div class="theme-post-num">100</div>
+        <div class="theme-post-label-name">评论</div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- 其它模块 -->
+<div id="id-userModule">
+  <!-- 微信公众号 -->
+  <div id="id-wechat" class="theme-sidebar-block">
+    <h3 class="theme-sidebar-block-title">微信公众号</h3>
+    <div class="theme-sidebar-block-content">
+      <img src="./assets/images/wechat.png" alt="">
     </div>
   </div>
+
+  <!-- QQ群 -->
+  <div id="id-qqg" class="theme-sidebar-block">
+    <h3 class="theme-sidebar-block-title">技术交流群</h3>
+    <div class="theme-sidebar-block-content">
+      <img src="./assets/images/qq.png" alt="">
+    </div>
+  </div>
+</div>
 
 </html>
