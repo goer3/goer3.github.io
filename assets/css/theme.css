@@ -12,6 +12,10 @@ body {
     background-color: #f7f7f8;
 }
 
+body::-webkit-scrollbar {
+    display: none;
+}
+
 .progress {
     background-color: #0948b3;
 }
@@ -529,10 +533,14 @@ code::-webkit-scrollbar-track {
     padding-left: 0;
 }
 
-.markdown-section ol li,
-.markdown-section ul li {
+.markdown-section ul>li {
     line-height: 30px;
     list-style-type: disc;
+}
+
+.markdown-section ol>li {
+    line-height: 30px;
+    list-style-type: decimal;
 }
 
 .markdown-section strong {
@@ -648,8 +656,9 @@ code::-webkit-scrollbar-track {
 /* 侧边小工具 */
 .theme-bar {
     position: fixed;
-    right: 30px;
-    bottom: 80px;
+    /* right: 30px; */
+    right: calc(calc(calc(100% - 1500px) / 2) - 10px);
+    bottom: 100px;
 }
 
 .theme-bar ul li {
@@ -659,6 +668,7 @@ code::-webkit-scrollbar-track {
     border: 1px solid #dddddd;
     margin-top: 2px;
     background-color: #fff;
+    box-shadow: 2px 2px 10px #ddd;
 }
 
 
@@ -672,7 +682,7 @@ code::-webkit-scrollbar-track {
 
 .theme-bar-wechatcode {
     position: fixed;
-    right: 80px;
+    right: calc(calc(calc(100% - 1500px) / 2) - 120px);
     bottom: 60px;
     display: none;
 }
