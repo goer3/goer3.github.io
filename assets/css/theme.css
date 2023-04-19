@@ -12,6 +12,10 @@ body {
     background-color: #f7f7f8;
 }
 
+.progress {
+    background-color: #0948b3;
+}
+
 .theme-navbar {
     position: fixed;
     height: 60px;
@@ -204,6 +208,11 @@ body.sticky .sidebar {
     padding: 0 10px;
     line-height: 30px;
     font-size: 12px;
+}
+
+.sidebar .search input:focus {
+    box-shadow: 0 0 5px #0948b3;
+    border: 1px solid #0948b3;
 }
 
 .sidebar ul {
@@ -577,6 +586,19 @@ code::-webkit-scrollbar-track {
     border-radius: 0;
     margin-bottom: 15px;
     font-size: 13px;
+}
+
+.gitalk-container .gt-container .gt-header-textarea:focus {
+    box-shadow: 0 0 5px #0948b3;
+    border: 1px solid #0948b3;
+}
+
+.gitalk-container .gt-container .gt-no-init {
+    font-size: 13px;
+}
+
+.gitalk-container .gt-container .gt-no-init a {
+    color: #c82333 !important;
 }
 
 .gitalk-container .gt-container .gt-svg svg {
