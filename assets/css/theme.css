@@ -4,11 +4,16 @@
     letter-spacing: 1px;
 }
 
+a {
+    text-decoration: none !important;
+}
+
 body {
     background-color: #f7f7f8;
 }
 
 .theme-navbar {
+    position: fixed;
     height: 60px;
     line-height: 60px;
     background-color: #fff;
@@ -306,4 +311,296 @@ body.sticky .sidebar {
 .app-nav>a {
     margin: 0;
     padding: 0;
+}
+
+
+/* 文章样式 */
+.markdown-section * {
+    word-spacing: 1px;
+    font-size: 13px;
+    /* font-family: Roboto Mono,Monaco,courier,monospace; */
+    /* font-family: Source Sans Pro, Helvetica Neue, Arial, sans-serif; */
+    font-family:  Arial, sans-serif;
+}
+
+.markdown-section h2 {
+    line-height: 30px;
+    margin: 50px 0 30px 0;
+    background-color: #0948b3;
+    font-size: 15px;
+    text-align: center;
+}
+
+.markdown-section h2 span {
+    letter-spacing: 2px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff !important;
+    line-height: 30px;
+    height: 30px;
+}
+
+.markdown-section p {
+    margin: 0;
+    line-height: 30px;
+}
+
+.markdown-section a {
+    font-weight: normal;
+    /* font-size: 14px; */
+}
+
+.markdown-section table {
+    margin: 10px 0;
+    border-collapse: collapse;
+    text-align: left;
+    width: 100%;
+}
+
+.markdown-section table thead th {
+    background-color: #1c2b36;
+    color: #fff !important;
+}
+
+.markdown-section table tr:nth-child(odd) {
+    background: #f0f0f0;
+}
+
+.markdown-section table td, .markdown-section table th {
+    border: 1px solid #fff;
+    padding: 6px 15px;
+    line-height: 20px;
+}
+
+.markdown-section blockquote {
+    margin: 10px 0 !important;
+    color: #819198 !important;
+    border-left: 0.2rem solid #4285f4 !important;
+    background: #f2f5f9 !important;
+    padding: 10px 20px !important;
+}
+
+.markdown-section p code {
+    border-radius: 2px;
+    color: #c82333 !important;
+    font-size: 12px !important;
+    padding: 2px 5px;
+    margin: 0;
+    vertical-align: middle;
+    border-radius: 2px;
+    background-color: #f6f6f6;
+    font-family:  Arial, sans-serif;
+}
+
+.markdown-section li code {
+    border-radius: 2px;
+    color: #c82333 !important;
+    font-size: 12px !important;
+    padding: 2px 5px;
+    margin: 0;
+    vertical-align: middle;
+    border-radius: 2px;
+    background-color: #f6f6f6;
+    font-family:  Arial, sans-serif;
+}
+
+.markdown-section pre {
+    background-color: #272822;
+    font-family: 'Roboto Mono', Monaco, courier, monospace;
+    line-height: 1.5rem;
+    margin: 10px 0;
+    padding: 10px 20px;
+}
+
+.markdown-section pre > code {
+    background-color: #272822;
+    border-radius: 2px;
+    color: #ffffff !important;
+    display: block;
+    font-family: 'Roboto Mono', Monaco, courier, monospace;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.token {
+    color: #fff !important;
+}
+
+.token.keyword, .token.function {
+    color: #F92772 !important;
+}
+
+.token.number {
+    color: #A6E22E !important;
+}
+
+.token.cdata, .token.comment, .token.doctype, .token.prolog {
+    color: #75715E !important;
+}
+
+.token.string, .token.char {
+    color: #E6DB74 !important;
+}
+
+.token.operator {
+    color: #A6E22E !important;
+}
+
+.token.placeholder, .token.variable {
+    color: #AE81FF !important;
+}
+
+.token.punctuation {
+    color: #75715E !important;
+}
+
+.token.punctuation {
+    color: #fff !important;
+}
+
+.token.atrule, .token.regex, .token.statement {
+    color: #F92772 !important;
+}
+
+.markdown-section .docsify-copy-code-button {
+    padding: 5px 10px;
+    font-size: 13px;
+    background-color: #0948b3;
+}
+
+.markdown-section .docsify-copy-code-button span {
+    color: #fff !important;
+}
+
+code::-webkit-scrollbar {
+    height: 7px;
+}
+
+code::-webkit-scrollbar-thumb {
+    border-radius: 0;
+    background-color: #fff;
+}
+
+code::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: #272822;
+    border-radius: 0;
+}
+
+.markdown-section p img[title="border"] {
+    border: 1px solid #ddd;
+}
+
+.markdown-section p img[title="bg-black"] {
+    background-color: #000;
+}
+
+.markdown-section ol, .markdown-section ul {
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 30px;
+    margin-left: 30px;
+    padding-left: 0;
+}
+
+.markdown-section ol li, .markdown-section ul li {
+    line-height: 30px;
+    list-style-type: disc;
+}
+
+.markdown-section strong {
+    font-weight: bolder;
+    font-size: 14px;
+    border-left: 5px solid #0948b3;
+    padding-left: 10px;
+    display: block;
+    height: 18px;
+    line-height: 18px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.markdown-section blockquote p {
+    font-weight: normal;
+    line-height: 25px;
+}
+
+/* 评论配置 */
+.gitalk-container .gt-container .gt-meta {
+    margin: 10px 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #e9e9e9;
+    font-size: 13px;
+}
+
+.gitalk-container .gt-container .gt-link {
+    border-bottom: none;
+}
+
+.gitalk-container .gt-container .gt-meta a {
+    color: #c82333 !important;
+    font-weight: bold;
+}
+
+.gitalk-container .gt-container .gt-meta * {
+    font-weight: bold;
+}
+
+.gitalk-container .gt-container .gt-popup * {
+    font-weight: normal;
+}
+
+.gitalk-container .gt-container .gt-header-textarea {
+    background-color: #fff;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    width: 100%;
+    border-radius: 0;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.gitalk-container .gt-container .gt-svg svg {
+    fill: #0948b3;
+}
+
+.gitalk-container .gt-container .gt-avatar {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+}
+
+.gitalk-container .gt-container .gt-ico-text {
+    font-size: 12px;
+}
+
+.gitalk-container .gt-container .gt-comments-null {
+    font-size: 13px;
+    text-align: center;
+}
+
+.gitalk-container .gt-container .gt-btn {
+    padding: 7px 15px;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+    border-radius: 0;
+    background-color: #0948b3;
+}
+
+.gitalk-container .gt-container .gt-btn span {
+    color: #fff !important;
+    font-size: 13px;
+    letter-spacing: 5px;
+}
+
+.gitalk-container .gt-container .gt-comment-content * {
+    font-size: 12px;
+}
+
+.gitalk-container .gt-container .gt-comment-username {
+    font-weight: bolder;
+    color: #c82333 !important;
 }
