@@ -53,7 +53,7 @@ docker create nginx:latest
 
 如图所示：
 
-![image-20230420215415632](images/DockerContainer/image-20230420215415632.png)
+![image-20230420215415632](images/DockerContainer/image-20230420215415632.png "bg-black")
 
 在不指定任何参数的情况下，通过 create 创建的容器不会启动，只会保持 `Created` 状态。
 
@@ -76,7 +76,7 @@ docker ps
 
 如图所示：
 
-![image-20230420215838378](images/DockerContainer/image-20230420215838378.png)
+![image-20230420215838378](images/DockerContainer/image-20230420215838378.png "bg-black")
 
 `ps` 和 `ls` 都可以查看运行中的容器，日常 ps 用的比较多。如果不加任何参数，默认只显示 `Up` 状态的容器。
 
@@ -104,7 +104,7 @@ docker start boring_kepler
 
 如图所示：
 
-![image-20230420231458856](images/DockerContainer/image-20230420231458856.png)
+![image-20230420231458856](images/DockerContainer/image-20230420231458856.png "bg-black")
 
 通过 create 创建的容器处于 Created 状态，可以使用 start 启动起来变成 `Up` 状态。
 
@@ -140,7 +140,7 @@ docker stop boring_kepler
 
 如图所示：
 
-![image-20230420231740279](images/DockerContainer/image-20230420231740279.png)
+![image-20230420231740279](images/DockerContainer/image-20230420231740279.png "bg-black")
 
 此时容器就变成了 `Exited` 状态，随后将其启动起来，用于后面的测试。
 
@@ -160,7 +160,7 @@ docker pause boring_kepler
 
 如图所示：
 
-![image-20230420232033879](images/DockerContainer/image-20230420232033879.png)
+![image-20230420232033879](images/DockerContainer/image-20230420232033879.png "bg-black")
 
 可以看到虽然显示的是 Up 状态，但是后面有个 `Paused` 标记。相比于 stop，这种停止容器的方式更温柔，能够保持容器当前状态。
 
@@ -180,7 +180,7 @@ docker unpause boring_kepler
 
 如图所示：
 
-![image-20230420232244377](images/DockerContainer/image-20230420232244377.png)
+![image-20230420232244377](images/DockerContainer/image-20230420232244377.png "bg-black")
 
 
 
@@ -198,7 +198,7 @@ docker kill boring_kepler
 
 如图所示：
 
-![image-20230420232932815](images/DockerContainer/image-20230420232932815.png)
+![image-20230420232932815](images/DockerContainer/image-20230420232932815.png "bg-black")
 
 容器变成 `Exited` 状态。
 
@@ -218,7 +218,7 @@ docker restart boring_kepler
 
 如图所示：
 
-![image-20230420233035110](images/DockerContainer/image-20230420233035110.png)
+![image-20230420233035110](images/DockerContainer/image-20230420233035110.png "bg-black")
 
 容器恢复 `Up` 状态。
 
@@ -240,7 +240,7 @@ docker exec -it boring_kepler /bin/bash
 
 如图所示：
 
-![image-20230420233439136](images/DockerContainer/image-20230420233439136.png)
+![image-20230420233439136](images/DockerContainer/image-20230420233439136.png "bg-black")
 
 通过 `-it` 参数创建一个交互式 tty 终端进入容器内部，同时还需要指定执行的命令。
 
@@ -262,7 +262,7 @@ docker attach boring_kepler
 
 如图所示：
 
-![image-20230420234148933](images/DockerContainer/image-20230420234148933.png)
+![image-20230420234148933](images/DockerContainer/image-20230420234148933.png "bg-black")
 
 和 exec 不同，如果在创建容器的时候没有使用 `-it` 参数，attach 不会创建交互式终端，而是直接在命令创建 hung 住，此时新开终端访问容器的 nginx 服务，就会直接在命令行界面输出日志信息。如果直接 `Ctrl + C`，容器会直接退出。
 
@@ -284,7 +284,7 @@ docker logs boring_kepler
 
 如图所示：
 
-![image-20230420235149503](images/DockerContainer/image-20230420235149503.png)
+![image-20230420235149503](images/DockerContainer/image-20230420235149503.png "bg-black")
 
 支持以下参数：
 
@@ -307,7 +307,7 @@ docker rename boring_kepler demo
 
 如图所示：
 
-![image-20230420235436618](images/DockerContainer/image-20230420235436618.png)
+![image-20230420235436618](images/DockerContainer/image-20230420235436618.png "bg-black")
 
 
 
@@ -325,7 +325,7 @@ docker stats demo
 
 如图所示：
 
-![image-20230420235638519](images/DockerContainer/image-20230420235638519.png)
+![image-20230420235638519](images/DockerContainer/image-20230420235638519.png "bg-black")
 
 实时动态刷新查看容器的资源使用情况。
 
@@ -345,7 +345,7 @@ docker top demo
 
 如图所示：
 
-![image-20230421000303520](images/DockerContainer/image-20230421000303520.png)
+![image-20230421000303520](images/DockerContainer/image-20230421000303520.png "bg-black")
 
 和 linux 的 top 命令类似，能看到容器内各个进程的使用情况。
 
@@ -382,7 +382,7 @@ docker rm -f demo
 
 如图所示：
 
-![image-20230421001204488](images/DockerContainer/image-20230421001204488.png)
+![image-20230421001204488](images/DockerContainer/image-20230421001204488.png "bg-black")
 
 如果容器正在运行，需要使用 `-f` 参数。
 
@@ -402,7 +402,7 @@ docker prune -f
 
 如图所示：
 
-![image-20230421001432080](images/DockerContainer/image-20230421001432080.png)
+![image-20230421001432080](images/DockerContainer/image-20230421001432080.png "bg-black")
 
 该方法用于删除所有退出状态的容器，通过 `-f` 参数能忽略提示。
 
@@ -418,11 +418,11 @@ docker container run nginx:latest
 
 默认会在前台启动，输出会打印在用户终端，并且 hung 住：
 
-![image-20230421001611746](images/DockerContainer/image-20230421001611746.png)
+![image-20230421001611746](images/DockerContainer/image-20230421001611746.png "bg-black")
 
 用户可以通过 `Ctrl + C` 退出，容器也会退出，如图所示：
 
-![image-20230421001706689](images/DockerContainer/image-20230421001706689.png)
+![image-20230421001706689](images/DockerContainer/image-20230421001706689.png "bg-black")
 
 <br>
 
@@ -492,7 +492,7 @@ docker container run -d \
 
 如图所示：
 
-![image-20230420225923391](images/DockerContainer/image-20230420225923391.png)
+![image-20230420225923391](images/DockerContainer/image-20230420225923391.png "bg-black")
 
 
 
