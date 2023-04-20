@@ -269,6 +269,7 @@ body.sticky .sidebar {
 
 .sidebar .sidebar-nav ul li .app-sub-sidebar {
     padding-left: 20px;
+    margin-bottom: 0;
 }
 
 .sidebar .sidebar-nav ul li.active>a {
@@ -375,6 +376,7 @@ body.sticky .sidebar {
     border-collapse: collapse;
     text-align: left;
     width: 100%;
+    display: table;
 }
 
 .markdown-section table thead th {
@@ -499,6 +501,7 @@ body.sticky .sidebar {
 
 .markdown-section .docsify-copy-code-button span {
     color: #fff !important;
+    border-radius: 0 !important;
 }
 
 code::-webkit-scrollbar {
@@ -546,13 +549,32 @@ code::-webkit-scrollbar-track {
 .markdown-section strong {
     font-weight: bolder;
     font-size: 14px;
+    border-left: 6px solid #0948b3;
+    padding-left: 10px;
+    display: block;
+    height: 6px;
+    line-height: 6px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.markdown-section h3 {
     border-left: 5px solid #0948b3;
     padding-left: 10px;
     display: block;
     height: 18px;
     line-height: 18px;
-    margin-top: 20px;
+    margin-top: 50px;
     margin-bottom: 10px;
+}
+
+.markdown-section h3 span,
+.markdown-section h3 
+{
+    font-weight: bolder;
+    font-size: 14px;
+    height: 18px;
+    line-height: 18px;
 }
 
 .markdown-section blockquote p {
