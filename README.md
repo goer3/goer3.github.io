@@ -1,3 +1,3 @@
-# Headline
+![bg](images/README/bg.png)
 
-> An awesome project.
+![background](images/README/background.svg)

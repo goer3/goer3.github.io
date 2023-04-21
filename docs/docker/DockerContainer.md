@@ -311,6 +311,26 @@ docker rename boring_kepler demo
 
 
 
+### 文件拷贝（cp）
+
+使用示例：
+
+```bash
+# Management Commands（推荐）
+docker container cp anaconda-ks.cfg demo:/tmp/
+docker container cp demo:/var/log/nginx/access.log /tmp/
+
+# Commands
+docker cp anaconda-ks.cfg demo:/tmp/
+docker cp demo:/var/log/nginx/access.log /tmp/
+```
+
+可以将宿主机的文件拷贝到容器中，也可以将容器中的文件拷贝到宿主机。
+
+如果拷贝的目的目录没有以 `/` 结尾，那么拷贝的文件会被重命名成拷贝路径的最后一级的名称。
+
+
+
 ### 容器状态（stats）
 
 使用示例：
@@ -408,7 +428,7 @@ docker prune -f
 
 
 
-### 运行容器（run）
+### 运行容器（run，重要）
 
 直接运行容器：
 
@@ -496,4 +516,21 @@ docker container run -d \
 
 
 
+### 查看端口（port）
+
+使用示例：
+
+```bash
+# Management Commands（推荐）
+docker container port nginx-demo
+
+# Commands
+docker port nginx-demo
+```
+
+如图所示：
+
+![image-20230421012814651](images/DockerContainer/image-20230421012814651.png "bg-balck")
+
+使用该方法可以看到容器和宿主机的端口映射情况。
 
