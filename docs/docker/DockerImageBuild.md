@@ -424,35 +424,204 @@ fi
 
 ### VOLUME
 
+`VOLUME` 指令用于挂在一个或多个存储卷。格式为：
+
+* `VOLUME ["<路径1>", "<路径2>"...]`
+* `VOLUME <路径>`
+
+容器运行时应尽量保持容器存储层不发生写操作，但数据写入往往又是不可避免的。为了防止运行时用户忘记将动态文件所保存的目录挂载为卷，可以在 Dockerfile 中事先指定某些目录挂载为匿名卷，这样在运行时如果用户不指定挂载，其应用也可以正常运行，不会向容器存储层写入大量数据，而且能是现实数据的持久化。
+
+使用示例：
+
+```bash
+VOLUME /data
+```
+
+这里的 `/data` 目录就会在容器运行时自动挂载为匿名卷，任何向 `/data` 中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化。当然，运行容器时可以通过 `-v` 参数覆盖这个挂载设置。
+
+所谓的匿名卷，其实就是 docker 定义的 volume，隐射的就是 docker 宿主机上的对应的目录。后面会单独说明。
+
+
+
+### HEALTHCHECK
+
+`HEALTHCHECK` 指令用于告诉 Docker 应该如何进行判断容器的状态是否正常。支持以下格式：
+
+* `HEALTHCHECK [选项] CMD <命令>`：设置检查容器健康状况的命令。
+* `HEALTHCHECK NONE`：如果基础镜像有健康检查指令，使用这行可以屏蔽掉其健康检查指令。
+
+在没有 HEALTHCHECK 指令前，Docker 引擎只可以通过容器内主进程是否退出来判断容器是否状态异常。很多情况下这没问题，但是如果程序进入死锁或死循环状态，应用进程并不会退出，但是容器已经无法提供服务，这不符合应用高可用原则。HEALTHCHECK 指令的价值就在于能够比较真实的反应容器实际状态。
+
+当在一个镜像指定了 HEALTHCHECK 后，用其启动容器，初始状态会为 `starting`，在 HEALTHCHECK 检查成功后变为 `healthy`，如果连续一定次数失败，则会变为 `unhealthy`。
+
+HEALTHCHECK 支持下列选项：
+
+- `--interval=<间隔>`：两次健康检查的间隔，默认为 30 秒。
+- `--timeout=<时长>`：健康检查运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒。
+- `--retries=<次数>`：当连续失败指定次数后，则将容器状态视为 `unhealthy`，默认 3 次。
+
+和 CMD, ENTRYPOINT 一样，HEALTHCHECK 只可以出现一次，如果写了多个，只有最后一个生效。
+
+使用示例：
+
+```bash
+HEALTHCHECK --interval=5s --timeout=3s CMD curl -fs http://localhost/ || exit 1
+```
+
+容器运行后，使用 docker container ls 就可以看到健康状态。使用 docker container inspect xxx 可以看到检测信息。
+
+
+
+### SHELL
+
+`SHELL` 指令用于指定 RUN，ENTRYPOINT，CMD 指令的 shell，Linux 中默认为 `["/bin/sh", "-c"]`。格式为：
+
+* `SHELL ["executable", "parameters"]`
+
+使用示例：
+
+```bash
+SHELL ["/bin/sh", "-cex"]
+```
+
+
+
+### ONBUILD
+
+`ONBUILD` 是一个特殊的指令，它后面跟的是其它指令，比如 RUN, COPY 等，这些指令在当前镜像构建时并不会被执行。只有当以当前镜像为基础镜像，去构建下一级镜像的时候才会被执行。
+
+使用示例：
+
+```bash
+FROM node:slim
+WORKDIR /hello
+ONBUILD RUN mkdir world
+CMD [ "/bin/sh", "-c", "echo Hello" ]
+```
+
+
+
+### STOPSIGNAL
+
+`STOPSIGNAL` 指令用于设置将发送到容器的退出系统信号。
+
+这个信号可以是一个有效的无符号数字，与内核的 `syscall` 表中的位置相匹配，如 `9`，或者是 `SIGNAME` 格式的信号名，如 `SIGKILL` 。格式为：
+
+* STOPSIGNAL signal
+
+默认的停止信号是 `SIGTERM`，在 `docker stop` 的时候会给容器内 PID 为 1 的进程发送这个signal，通过 `--stop-signal` 可以设置自己需要的 signal。
+
+这样做的主要的目的是为了让容器内的应用程序在接收到 signal 之后可以先做一些事情，实现容器的平滑退出。
+
+如果不做任何处理，容器将在一段时间之后强制退出，会造成业务的强制中断，这个时间默认是 10s。
 
 
 
 
 
+## Dockerfile 编写规范
+
+在制作 Dockerfile 的时候，应该尽可能的遵守一些约定俗称的方法和建议：
+
+* 容器应该是短暂的
+
+  * 通过 Dockerfile 构建的镜像生命周期不宜过长，容器从销毁到创建都应该将工作量降到最小。
+
+* 增加 `.dockerigonre` 文件
+
+  * 每一个项目都应该有一个单独的目录，单独的 .dockerignore 文件用于忽略不需要的文件或目录，构建镜像所需的文件都应该存放到该目录下。
+
+* 避免不必要的文件，使用多阶段构建
+
+  * 在 Dockerfile 的每一层定义中，在进入下一层之前，都需要删除掉其它不需要的文件，以此尽可能的减小镜像的体积。
+  * 比如通过 Dockerfile 直接完成打包，运行，打包这一步除了打出来的包其它的文件其实都是没用的，此时就是和多阶段构建。
+
+* 一个容器只运行一个进程
+
+  * 应该保证每个容器只有一个进程，多个进程解耦到不同容器中，便于后续的扩展。
+
+* 将多行参数排序
+
+  * 某些参数太多太长需要换行的，尽可能按照字母顺序排序，这样可以避免重复。
+
+* 使用构建缓存
+
+  * 在镜像的构建过程中，Docker 会遍历 Dockerfile 文件中的指令，然后按顺序执行。在执行每条指令之前，Docker 都会在缓存中查找是否已经存在可重用的镜像，如果有就使用现存的镜像，不再重复创建。如果你不想在构建过程中使用缓存，你可以在 `docker build` 命令中使用 `--no-cache=true` 选项。
 
 
 
 
 
+## 多阶段构建示例
+
+多阶段构建，前一阶段的镜像会被丢弃，只保留需要的结果：
+
+```bash
+# 第一阶段，打包。使用 as 对阶段进行命名，每一个 FROM 就是一个阶段
+FROM golang:latest as build
+WORKDIR /go/src/github.com/alexellis/href-counter/
+RUN go get -d -v golang.org/x/net/html 
+COPY app.go .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
+
+# 第二阶段，运行。
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+# 从第一阶段中拷贝打好的包，build 为第一阶段的名称
+COPY --from=build /go/src/github.com/alexellis/href-counter/app .
+CMD ["./app"] 
+```
+
+多阶段构建的好处在于，能够最小化的减小镜像的大小。
 
 
 
 
 
+## 完整示例
 
+TOMCAT 示例：
 
+```bash
+# 基础就像
+FROM centos
 
+# 定义元数据
+LABEL auhtor="Dy1an" \
+	  email="1214966109@qq.com" \
+	  desc="TOMCAT Demo Dockerfile"
 
+# 定义环境变量
+ENV WORK_PATH=/ops \
+	ENV_PATH=${WORK_PATH}/env \
+	SERVICE_PATH=${WORK_PATH}/service
 
+# 添加 JDK
+ADD jdk-8u11-linux-x64.tar.gz ${ENV_PATH}/
 
+# 添加 TOMCAT
+ADD apache-tomcat-9.0.22.tar.gz ${SERVICE_PATH}/
 
+# 拷贝文件
+COPY ROOT.war ${SERVICE_PATH}/webapps/
 
+# 进入目录
+WORKDIR ${SERVICE_PATH}/webapps/
 
+# 解压安装包
+RUN unzip ROOT.war -d ROOT && rm -f ROOT.war
 
+# 定义环境变量
+ENV JAVA_HOME=${ENV_PATH}/jdk1.8.0_11 \
+	CLASSPATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar \
+	CATALINA_HOME=${SERVICE_PATH}/apache-tomcat-9.0.22 \
+	PATH $PATH:$JAVA_HOME/bin:$CATALINA_HOME/lib:$CATALINA_HOME/bin
 
+# 声明端口
+EXPOSE 8080
 
-
-
-
-
+# 启动项目
+CMD ${CATALINA_HOME}/bin/startup.sh && tail -f ${CATALINA_HOME}/logs/catalina.out
+```
 
