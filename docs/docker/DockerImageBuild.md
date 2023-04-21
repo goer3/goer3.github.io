@@ -14,7 +14,7 @@ docker container commit -a dylan -m "container to image" -p nginx-demo ezops.cn/
 
 如图所示：
 
-![image-20230421013625056](images/DockerImageBuild/image-20230421013625056.png)
+![image-20230421013625056](images/DockerImageBuild/image-20230421013625056.png "bg-black")
 
 使用 commit 创建的镜像意味着所有对镜像的操作都是黑箱操作，这样生成的镜像被称为 `黑箱镜像`。
 
@@ -59,7 +59,7 @@ docker image build -t ezops.cn/devops/nginx:1.0 .
 
 如图所示：
 
-![image-20230421122250600](images/DockerImageBuild/image-20230421122250600.png)
+![image-20230421122250600](images/DockerImageBuild/image-20230421122250600.png "bg-black")
 
 结果说明：
 
