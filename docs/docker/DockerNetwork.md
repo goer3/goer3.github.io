@@ -23,7 +23,7 @@ docker network ls
 
 如图所示：
 
-![image-20230422005322147](images/DockerNetwork/image-20230422005322147.png)
+![image-20230422005322147](images/DockerNetwork/image-20230422005322147.png "bg-black")
 
 在运行容器时，可以使用 `--network` 或者 `--net` 指定容器使用的网络模式，如：`--net bridge`。
 
@@ -133,7 +133,7 @@ docker network create -d bridge bridge_demo2
 
 `-d，--driver` 参数可以指定网络模式，默认不指定就是 bridge 模式。
 
-![image-20230422015118401](images/DockerNetwork/image-20230422015118401.png)
+![image-20230422015118401](images/DockerNetwork/image-20230422015118401.png "bg-black")
 
 可以看到宿主机也创建了两个类似于 docker0 的网桥，网段是 `172.18.0.0/16` 和 `172.19.0.0/16`。
 
@@ -166,7 +166,7 @@ docker exec -it demo4 ip a | grep 172
 
 如图所示：
 
-![image-20230422020239072](images/DockerNetwork/image-20230422020239072.png)
+![image-20230422020239072](images/DockerNetwork/image-20230422020239072.png "bg-black")
 
 创建的容器都被分配到自己网桥的网段，同时通过进入容器就行网络连通性测试，可以发现：
 
@@ -186,11 +186,11 @@ docker network connect bridge_demo1 demo1
 
 此时这个容器就会新增一个新的网卡：
 
-![image-20230422021224938](images/DockerNetwork/image-20230422021224938.png)
+![image-20230422021224938](images/DockerNetwork/image-20230422021224938.png "bg-black")
 
 同时容器也能和新增网络的容器进行通信：
 
-![image-20230422021311219](images/DockerNetwork/image-20230422021311219.png)
+![image-20230422021311219](images/DockerNetwork/image-20230422021311219.png "bg-black")
 
 
 
@@ -204,7 +204,7 @@ docker network disconnect bridge_demo1 demo1
 
 如图所示：
 
-![image-20230422021626881](images/DockerNetwork/image-20230422021626881.png)
+![image-20230422021626881](images/DockerNetwork/image-20230422021626881.png "bg-black")
 
 如果所有网络都断开，那么容器就属于 none 网络了。
 
@@ -239,7 +239,7 @@ docker container run -d -P --name demo1 nginx
 
 如图所示：
 
-![image-20230422022338654](images/DockerNetwork/image-20230422022338654.png)
+![image-20230422022338654](images/DockerNetwork/image-20230422022338654.png "bg-black")
 
 可以直接在浏览器上使用 `http://192.168.2.100:32768` 地址进行访问。
 
@@ -271,7 +271,7 @@ docker container run -d -p "0.0.0.0:8080:80/udp" --name demo4 nginx
 
 如图所示：
 
-![image-20230422022813183](images/DockerNetwork/image-20230422022813183.png)
+![image-20230422022813183](images/DockerNetwork/image-20230422022813183.png "bg-black")
 
 
 

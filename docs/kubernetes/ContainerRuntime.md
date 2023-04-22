@@ -175,7 +175,266 @@ ctr version
 
 
 
+## Nerdctl
+
+和 Docker 类似，Containerd 也有自己类似的客户端工具 `ctr`，不过大部分选择 Containerd 的人都是从 Docker 转过的，ctr 作为全新的客户端工具，在使用方法上和 Docker 是有明显的区别的，这就加剧了大家的学习成本。
+
+为此，社区提供了另外一种解决方案 `nerdctl`。该方法除了和 docker 命令中 `docker` 这个关键字不同以外，其它用法几乎一模一样，甚至还兼容了 docker-compose 的语法。简直离了大谱。那为啥还要用难用的 ctr 命令甚至 docker。
+
+> https://github.com/containerd/nerdctl
+
+官方提供了两种安装包：
+
+* nerdctl：单纯只有 nerdctl 工具，Containerd 需要单独配置安装。
+* `nerdctl-full`：包含了所有需要的工具和 Containerd。
+
+目前官方提供的最新版本为 `1.3.1`，它包含一下工具：
+
+- nerdctl: v1.3.1
+- containerd: v1.7.0
+- runc: v1.1.5
+- CNI plugins: v1.2.0
+- BuildKit: v0.11.5
+- Stargz Snapshotter: v0.14.3
+- imgcrypt: v1.1.7
+- RootlessKit: v1.1.0
+- slirp4netns: v1.2.0
+- bypass4netns: v0.3.0
+- fuse-overlayfs: v1.11
+- containerd-fuse-overlayfs: v1.0.5
+- Kubo (IPFS): v0.19.1
+- Tini: v0.19.0
+- buildg: v0.4.1
 
 
+
+### 安装准备
+
+准备一台测试机器用于安装 nerdctl-full，配置如下：
+
+| IP            | 系统                          | CPU  | 内存 | 硬盘 |
+| ------------- | ----------------------------- | ---- | ---- | ---- |
+| 192.168.2.100 | CentOS Linux release 7.9.2009 | 4    | 4    | 30   |
+
+
+
+### 安装服务
+
+基础安装方法如下：
+
+```bash
+# 安装依赖
+yum -y install vim lrzsz wget zip unzip tree bash-completion
+
+# 更新 libseccomp，解决容器启动报错
+rpm -e libseccomp-2.3.1-4.el7.x86_64 --nodeps
+wget https://vault.centos.org/centos/8/BaseOS/x86_64/os/Packages/libseccomp-2.5.1-1.el8.x86_64.rpm
+rpm -ivh libseccomp-2.5.1-1.el8.x86_64.rpm 
+
+# 下载安装包，国内下载慢可可以使用 Github proxy 加速
+cd /usr/local/src/
+mkdir nerdctl
+cd nerdctl/
+wget https://github.com/containerd/nerdctl/releases/download/v1.3.1/nerdctl-full-1.3.1-linux-amd64.tar.gz
+
+# 解压安装
+tar -C /usr/local -zxf nerdctl-full-1.3.1-linux-amd64.tar.gz
+
+# 创建 Containerd 默认配置
+mkdir /etc/containerd
+containerd config default > /etc/containerd/config.toml
+
+# 启动 Containerd
+systemctl enable containerd --now
+
+# 查看 Containerd 版本
+ctr version
+
+# 查看 Nerdctl 版本
+nerdctl version
+```
+
+nerdctl-full 安装包解压后有 4 个目录，分别是：
+
+* `bin`：nertctl 的可执行文件，包含 nertdctl 和 ctr 等命令，最终被解压到 /usr/local/bin 下面。
+* `lib`：包含了启动服务的 service 文件，最终被解压到 `/usr/local/lib` 下面。
+* `libexec`：包含其它不从的命令工具，最终被解压到 `/usr/local/libexec` 下面。
+* `share`：文档信息，最终被解压到 `/usr/local/share` 下面。
+
+
+
+### 镜像构建（按需）
+
+如果需要像 docker 一样 build Dockerfile，还需要启动 `BuildKit` 服务。
+
+BuildKit 是 docker 公司开发的下一代 docker build 工具，具有更高效、更安全、 易于扩展等特点。由 buildkitd 和 buildctl 组成：
+
+- buildkitd：服务端，连接容器运行时，目前支持 runc 和 containerd 作为镜像构建环境，默认是 runc。
+- buildctl：客户端，负责解析 Dockerfile 文件，并向 buildkitd 发出构建请求。由于命令复杂，使用 nerdctl 替代。
+
+直接启动即可：
+
+```bash
+systemctl enable buildkit
+systemctl start buildkit
+```
+
+
+
+### 模拟 docker
+
+由于 nerdctl 命令用法和 docker 几乎一模一样，为了更方便的使用它，完全可以给他取个别名，就叫 docker。
+
+```bash
+# 配置别名
+cat >> ~/.bashrc << EOF
+# nerdctl 别名
+alias docker=nerdctl
+EOF
+
+# 应用配置
+source ~/.bashrc
+```
+
+现在完全可以像使用 docker 一样使用 Containerd：
+
+![image-20230422183539517](images/ContainerRuntime/image-20230422183539517.png "bg-black")
+
+
+
+### 命令补全
+
+为了方便使用，可以添加上命令 Tab 补全：
+
+```bash
+# 配置
+nerdctl completion bash > /etc/bash_completion.d/nerdctl
+nerdctl completion bash > /etc/bash_completion.d/docker
+sed -i "s#nerdctl#docker#g" /etc/bash_completion.d/docker
+
+# 生效配置
+source /etc/bash_completion.d/nerdctl
+source /etc/bash_completion.d/docker
+```
+
+此时最好是退出一次终端再重新连接，就可以看到 tab 已经能实现命令补全了，不管是 docker 命令还是 nerdctl 命令。
+
+
+
+
+
+## CGroup（了解）
+
+`CGroup`（Linux Control Group），其作用是限制一组进程使用的资源（CPU、内存等）上限，是 Containerd 容器技术的核心实现原理之一，首先需要了解几个基本概念：
+
+- Task：CGroup 中的 Task 可以理解为一个进程，但它实际上是进程 ID 和线程 ID 列表。
+- CGroup：控制组，一个控制组就是一组按照某种标准划分的 Tasks，可以理解为资源限制是以进程组为单位实现的，一个进程加入到某个控制组后，就会受到相应配置的资源限制。
+- Hierarchy：CGroup 的层级组织关系。CGroup 以树形层级组织，每个 CGroup 子节点默认继承其父节点的配置属性，这样每个 Hierarchy 在初始化会有 root CGroup。
+- Subsystem：子系统，表示具体的资源配置，如 CPU 使用，内存占用等，Subsystem 附加到 Hierarchy 上后可用。
+
+<br>
+
+CGroup 支持的子系统包含以下几类，即为每种可以控制的资源定义了一个子系统：
+
+- `cpuset`：为 CGroup 中的进程分配单独的 CPU 节点，绑定特定的 CPU。
+- `cpu`：限制 CGroup 中进程的 CPU 使用份额。
+- `cpuacct`：统计 CGroup 中进程的 CPU 使用情况。
+- `memory`：限制 CGroup 中进程的内存使用，并能报告内存使用情况。
+- `devices`：控制 CGroup 中进程能访问哪些文件设备（设备文件的创建、读写）。
+- `freezer`：挂起或恢复 CGroup 中的 Task。
+- `net_cls`：可以标记 CGroup 中进程的网络数据包，然后可以使用 tc 模块对数据包进行控制。
+- `blkio`：限制 CGroup 中进程的块设备 IO。
+- `perf_event`：监控 CGroup 中进程的 perf 时间，可用于性能调优。
+- `hugetlb`：hugetlb 的资源控制功能。
+- `pids`：限制 CGroup 中可以创建的进程数。
+- `net_prio`：允许管理员动态的通过各种应用程序设置网络传输的优先级。
+
+通过上面的各个子系统，可以看出使用 CGroups 可以控制的资源有：CPU、内存、网络、IO、文件设备等。
+
+查看当前系统支持的子系统：
+
+```bash
+cat /proc/cgroups
+```
+
+如图所示：
+
+![image-20230422192250943](images/ContainerRuntime/image-20230422192250943.png "bg-black")
+
+<br>
+
+CGroup 具有以下几个特点：
+
+* CGroup 的 API 以一个伪文件系统（/sys/fs/cgroup/）的实现方式，用户的程序可以通过文件系统实现 CGroup 的组件管理。
+* CGroup 的组件管理操作单元可以细粒度到线程级别，用户可以创建和销毁 CGroup，从而实现资源载分配和再利用。
+* 所有资源管理的功能都以子系统的方式实现，接口统一子任务创建之初与其父任务处于同一个 CGroup 的控制组。
+
+<br>
+
+查看挂载信息：
+
+```bash
+df -h | grep cgroup
+```
+
+如图所示：
+
+![image-20230422192549582](images/ContainerRuntime/image-20230422192549582.png "bg-black")
+
+可以看到 `/sys/fs/cgroup` 被挂载到了系统中，这意味着 cgroup 其实是一种文件系统类型，所有的操作都是通过文件来完成的。
+
+挂载目录下的每个子目录就对应着一个子系统，cgroup 是以目录形式组织的，`/` 是 cgroup 的根目录，但是这个根目录可以被挂载到任意目录。
+
+例如 CGroup 的 memory 子系统的挂载点是 `/sys/fs/cgroup/memory`，那么该目录就是 memory 子系统的根目录。该目录下还包含了 `system.slice` 等目录，进入可以看到正在运行的 containerd 等服务的目录，这些服务所有内存相关的 CGroup 配置都在名称对应的目录下面，如图所示：
+
+![image-20230422193144887](images/ContainerRuntime/image-20230422193144887.png "bg-black")
+
+<br>
+
+如果 linux 系统使用 systemd 初始化系统，初始化进程会生成一个 root CGroup，每个 systemd unit 都将会被分配一个 CGroup。
+
+容器运行时的 CGroup 是可以配置的，如 containerd 可以选择使用 `cgroupfs` 或 `systemd` 作为 CGroup 驱动，containerd 默认使用的是 cgroupfs。
+
+但这样对于使用了 systemd 的 linux 发行版来说，就同时存在了两个 cgroup 管理器：
+
+* 对于该服务器上启动的容器使用的是 cgroupfs。
+
+* 对于其他 systemd 管理的进程使用的是 systemd。
+
+> 两种驱动可能导致服务器在高负载的情况下变的不稳定。因此对于使用了 systemd 的 linux 系统，推荐将容器运行时的 CGroup 驱动使用 `systemd`。
+
+
+
+
+
+## Namespace（了解）
+
+`Namespace` 也称命名空间，是 Linux 提供的用于隔离进程树、网络接口、挂载点以及进程间通信等资源的方法
+
+在服务器上启动多个服务的时候，这些服务其实是会相互影响的，每一个服务都能看到其他服务的进程，也可以访问宿主机器上的任意文件，一旦服务器上的某一个服务被入侵，那么入侵者就能够访问当前机器上的所有服务和文件，这是大家不愿意看到的。作为用户，更希望运行在同一台机器上的不同服务能做到完全隔离，就像运行在多台不同的机器上一样。容器其实就通过 Linux 的 Namespace 技术来实现的对不同的容器进行隔离。
+
+linux 共有 6（7）种命名空间:
+
+- `ipc namespace`：管理对 IPC 资源（进程间通信、信号量、消息队列和共享内存）的访问。
+- `net namespace`：网络设备、网络栈、端口等隔离。
+- `mnt namespace`：文件系统挂载点隔离。
+- `pid namespace`：用于进程隔离。
+- `user namespace`：用户和用户组隔离（3.8以后的内核才支持）。
+- `uts namespace`：主机和域名隔离。
+- `cgroup namespace`：用于 cgroup 根目录隔离（4.6以后版本的内核才支持）。
+
+通过 `lsns` 命令可以看到当前系统创建的命名空间：
+
+![image-20230422202339702](images/ContainerRuntime/image-20230422202339702.png "bg-black")
+
+`/proc/<pid>/ns` 目录下记录指定进程所属的命名空间：
+
+![image-20230422202518514](images/ContainerRuntime/image-20230422202518514.png "bg-black")
+
+这些 namespace 都是链接文件, 格式为 `namespaceType:[inode number]`，`inode number` 用来标识一个 namespace，可以理解为 namespace id，如果两个进程的某个命名空间的链接文件指向同一个，那么其相关资源在同一个命名空间中，也就没有隔离了。
+
+查看运行的容器使用的 Namespace：
+
+![image-20230422202759074](images/ContainerRuntime/image-20230422202759074.png "bg-black")
 
 
