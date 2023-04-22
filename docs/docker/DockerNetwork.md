@@ -223,7 +223,7 @@ docker network rm bridge_demo2
 
 
 
-## 断开映射
+## 端口映射
 
 当容器内部应用想要暴露给外部访问，就需要使用到 `-P` 或者 `-p` 参数来进行端口映射。
 
@@ -277,15 +277,35 @@ docker container run -d -p "0.0.0.0:8080:80/udp" --name demo4 nginx
 
 
 
+## 跨主机通信
 
+上面对于 docker 的操作都是单主机的，这在生产应用中显然不合理。如果想要容器之间跨主机通信，目前能做的就只有端口映射，但这种方式配置成本很高。所以此时就需要用到一些新的网络模式。
 
+docker 是原生支持跨主机通信的，主要方案有两种：
 
+* macvlan
+* `overlay`（主要）
 
+同样也有第三方方案提供这样的支持：
 
+* `flannel`
+* `calico`
 
+这在 Kubernetes 中集群网络插件会用到，云平台的 Kubernetes 一般会提供 flannel 插件，自建一般也可以选择 calico。
 
+<br>
 
+docker 为支持跨主机通信提供了 overlay driver，用户可以创建基于 `VxLAN` 的 overlay 网络（叠加网络）。
 
+VxLAN 可将二层数据封装到 UDP 进行传输，它提供与 VLAN 相同的以太网二层服务，但是拥有更强的扩展性和灵活性。
 
+同时，overlay 网络也需要一个第三方的 key-value 数据库用于保存网络状态信息，包括 Network、Endpoint、IP 等。常见的包含：Consul、`Etcd` 和 ZooKeeper 等，目前包括 Kubernetes，最主流的选择就是 Etcd。
 
+特别注意：
+
+>Standalone (“classic”) Swarm has been deprecated, and with that the use of overlay networks using an external key/value store. The corresponding `--cluster-advertise`, `--cluster-store`, and `--cluster-store-opt` daemon options have been removed.
+
+官方有说明，从 docker v20.10 版本中弃用，v23.0.0 正式移除了对于 overlay 的外部存储支持功能。
+
+所以已经不再推荐使用 docker 的跨主机通信了，直接上 Kubernetes 吧，使用第三方网络插件方案。
 
