@@ -319,6 +319,8 @@ source /etc/bash_completion.d/docker
 
 此时最好是退出一次终端再重新连接，就可以看到 tab 已经能实现命令补全了，不管是 docker 命令还是 nerdctl 命令。
 
+后续还有很多配置需要修改，想要了解可以查看 Kubernetes 集群初始化安装的文档。
+
 
 
 
