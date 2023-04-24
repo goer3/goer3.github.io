@@ -73,13 +73,14 @@ sed -ri '/^[^#]*swap/s@^@#@' /etc/fstab
 
 ```bash
 # 服务器目录规划
-mkdir -p /ezops/{service,package,backup,shell}
+mkdir -p /ezops/{service,package,env,backup,shell}
 ```
 
 目录说明：
 
 * `service`：用户服务安装目录。
 * `package`：安装包存放目录。
+* `env`：运行环境服务存放，如 JDK，Go 等。
 * `backup`：数据备份目录。
 * `shell`：用户脚本存放目录。
 
@@ -188,6 +189,65 @@ EOF
 
 
 
+### 启用 CGroup  V2
+
+关于 CGroup V2 的说明，官方文档中有提到：
+
+> https://kubernetes.io/zh-cn/docs/concepts/architecture/cgroups/
+
+Rootless Container 中也有提到：
+
+> https://rootlesscontaine.rs/getting-started/common/cgroup2/
+
+在 Linux 上，CGroup 用于约束分配给进程的资源。Kubelet 和底层容器运行时都需要对接 CGroup 来为 Pod 和容器管理资源， 这包括为容器化工作负载配置 CPU / 内存请求和限制。
+
+Linux 中有两个 CGroup 版本：`CGroup v1` 和 `CGroup v2`
+
+CGroup v2 是新一代 CGroup API，提供了具有增强资源管理能力的统一控制系统。Kubernetes 从 `1.25` 开始完全支持 CGroup v2。
+
+<br>
+
+使用 CGroup v2 的推荐方法是使用一个默认启用 CGroup v2 的 Linux 发行版。如果不是，则 Linux 服务器需要满足以下要求：
+
+- 系统支持 CGroup v2
+- 内核为 5.8 以上版本
+- 容器运行时支持 CGroup v2。例如：
+  - Containerd v1.4 以上版本
+  - cri-o v1.20 以上版本
+- Kubelet 和容器运行时被配置为使用 systemd cgroup 驱动
+
+<br>
+
+查看当前 CGroup 版本：
+
+```bash
+stat -fc %T /sys/fs/cgroup/
+```
+
+如果是 CGroup v2，输出为 `cgroup2fs`，如果是 CGroup v1，输出为 `tmpfs`。
+
+<br>
+
+CentOS 7.9 配置 CGroup v2 需要升级 systemd 的版本：
+
+执行服务器：`所有节点`
+
+```bash
+# 查看支持的 CGroup 版本，可以看到 CGroup V2
+grep cgroup /proc/filesystems
+
+# 升级 systemd，建议 systemd ≥ v226
+wget https://copr.fedorainfracloud.org/coprs/jsynacek/systemd-backports-for-centos-7/repo/epel-7/jsynacek-systemd-backports-for-centos-7-epel-7.repo -O /etc/yum.repos.d/systemd-centos-7.repo
+yum -y update systemd
+
+# 查看 systemd 版本
+systemctl --version
+```
+
+后续操作需要配合内核升级完成！
+
+
+
 ### 内核升级
 
 在 Kubernetes 的 Github 仓库中：
@@ -200,11 +260,7 @@ EOF
 
 这意味着内核 5.10 版本以后会使用 openat2 进行更快的挂载检测。
 
-同时，官方文档中关于 CGroup v2 也有提到，内部版本要高于 5.8：
-
-> https://kubernetes.io/zh-cn/docs/concepts/architecture/cgroups/
-
-所有本文选择了 `5.11.16` 版本，更新于 2021 年 4 月。如果想安装其它版本可以去下面网站下载：
+所以本文选择了 `5.13.0` 版本。如果想安装其它版本可以去下面网站下载：
 
 > http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/
 
@@ -212,10 +268,10 @@ EOF
 
 内核升级所需安装包：
 
-| 安装包          | 版本号  | 说明       | 下载地址                                                     |
-| --------------- | ------- | ---------- | ------------------------------------------------------------ |
-| kernel-ml       | 5.11.16 | Linux 内核 | [点击下载](http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-5.11.16-1.el7.elrepo.x86_64.rpm) |
-| kernel-ml-devel | 5.11.16 | Linux 内核 | [点击下载](http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-devel-5.11.16-1.el7.elrepo.x86_64.rpm) |
+| 安装包          | 版本号 | 说明       | 下载地址                                                     |
+| --------------- | ------ | ---------- | ------------------------------------------------------------ |
+| kernel-ml       | 5.13.0 | Linux 内核 | [点击下载](http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-5.13.0-1.el7.elrepo.x86_64.rpm) |
+| kernel-ml-devel | 5.13.0 | Linux 内核 | [点击下载](http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-devel-5.13.0-1.el7.elrepo.x86_64.rpm) |
 
 <br>
 
@@ -225,15 +281,25 @@ EOF
 # 下载安装
 mkdir /ezops/package/kernel
 cd /ezops/package/kernel
-wget http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-5.11.16-1.el7.elrepo.x86_64.rpm
-wget http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-devel-5.11.16-1.el7.elrepo.x86_64.rpm
+wget http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-5.13.0-1.el7.elrepo.x86_64.rpm
+wget http://193.49.22.109/elrepo/kernel/el7/x86_64/RPMS/kernel-ml-devel-5.13.0-1.el7.elrepo.x86_64.rpm
 yum localinstall -y kernel-ml*
 
 # 设置内核启动顺序
-grub2-set-default 0 && grub2-mkconfig -o /etc/grub2.cfg
+grub2-set-default 0
+
+# 添加 CGroup V2 启动配置
+sed -i '5 a GRUB_CMDLINE_LINUX_DEFAULT="cgroup_no_v1=1 systemd.unified_cgroup_hierarchy=1"' /etc/default/grub
+cat /etc/default/grub
+
+# 生成配置
+grub2-mkconfig -o /etc/grub2.cfg
 
 # 查看默认内核
 grubby --default-kernel
+
+# 卸载旧版本内核
+rpm -qa | grep "kernel" | grep "kernel-3.10" | xargs rpm -e
 ```
 
 
@@ -278,10 +344,11 @@ ipt_REJECT
 ipip
 EOF
 
+# 这里启动会报错，不影响
 systemctl enable --now systemd-modules-load
 ```
 
-节点通信需要用到 LVS，所有需要安装 `ipvsadm`。这里启动会报错，不影响。
+节点通信需要用到 LVS，所有需要安装 `ipvsadm`。
 
 
 
@@ -317,7 +384,7 @@ net.core.somaxconn = 16384
 EOF
 ```
 
-完成后就可以重启服务器，虚拟机可以这个时候做个快照：
+完成后就可以重启服务器：
 
 ```bash
 reboot
@@ -329,7 +396,22 @@ reboot
 lsmod | grep --color=auto -e ip_vs -e nf_conntrack
 ```
 
+查看现在的 CGroup 版本：
 
+```bash
+stat -fc %T /sys/fs/cgroup/
+```
+
+此时已经可以看到输出为 `cgroup2fs`，也就是 CGroup v2 了。
+
+同时也会生成以下文件：
+
+```bash
+ll /sys/fs/cgroup/cgroup.controllers
+ll /sys/fs/cgroup/user.slice/user-$(id -u).slice/user@$(id -u).service/cgroup.controllers
+```
+
+如果文件不存在，说明 CGroup v2 配置存在问题。
 
 
 
@@ -1050,4 +1132,27 @@ systemctl enable --now keepalived
 此时停止 `slb-01` 上的 nginx 服务，过一会儿发现 keepalived 也跟着停止，VIP 已经漂移到 `slb-02` 上。
 
 
+
+
+
+## 免密配置（按需）
+
+可以在 `ops` 配置其它机器的免密登录，方便后续进行文件的分发。
+
+执行服务器：`ops`
+
+```bash
+# 生成公钥私钥
+ssh-keygen -t rsa
+
+# 分发到其它机器
+ssh-copy-id root@192.168.2.221
+ssh-copy-id root@192.168.2.222
+ssh-copy-id root@192.168.2.223
+ssh-copy-id root@192.168.2.231
+ssh-copy-id root@192.168.2.232
+ssh-copy-id root@192.168.2.233
+```
+
+测试免密登录是否正常。
 
