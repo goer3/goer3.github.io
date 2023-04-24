@@ -205,7 +205,7 @@ EOF
 
 CA 证书签发结果如图所示：
 
-![image-20230424165532617](images/KubernetesInstallBinary/image-20230424165532617.png)
+![image-20230424165532617](images/KubernetesInstallBinary/image-20230424165532617.png "bg-black")
 
 
 
@@ -274,7 +274,7 @@ cfssl gencert -ca=etcd-ca.pem -ca-key=etcd-ca-key.pem -config=ca-config.json -pr
 
 如图所示：
 
-![image-20230424170352874](images/KubernetesInstallBinary/image-20230424170352874.png)
+![image-20230424170352874](images/KubernetesInstallBinary/image-20230424170352874.png "bg-black")
 
 
 
@@ -471,7 +471,7 @@ etcdctl endpoint status --cluster -w table | grep -v "127.0.0.1"
 
 如图所示：
 
-![image-20230424173048269](images/KubernetesInstallBinary/image-20230424173048269.png)
+![image-20230424173048269](images/KubernetesInstallBinary/image-20230424173048269.png "bg-black")
 
 到此，ETCD 高可用集群部署完成！
 
@@ -639,7 +639,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 
 如图所示：
 
-![image-20230424185945602](images/KubernetesInstallBinary/image-20230424185945602.png)
+![image-20230424185945602](images/KubernetesInstallBinary/image-20230424185945602.png "bg-black")
 
 
 
@@ -678,7 +678,7 @@ cfssl gencert -ca=front-proxy-ca.pem -ca-key=front-proxy-ca-key.pem -config=ca-c
 
 生成的证书如图所示：
 
-![image-20230424190553505](images/KubernetesInstallBinary/image-20230424190553505.png)
+![image-20230424190553505](images/KubernetesInstallBinary/image-20230424190553505.png "bg-black")
 
 
 
@@ -734,7 +734,7 @@ kubectl config use-context kubernetes-admin@kubernetes --kubeconfig=/ezops/cert/
 
 生成的证书如图所示：
 
-![image-20230424191953472](images/KubernetesInstallBinary/image-20230424191953472.png)
+![image-20230424191953472](images/KubernetesInstallBinary/image-20230424191953472.png "bg-black")
 
 
 
@@ -751,7 +751,7 @@ openssl rsa -in /ezops/cert/kubernetes/sa.key -pubout -out /ezops/cert/kubernete
 
 查看生成的文件：
 
-![image-20230424192313383](images/KubernetesInstallBinary/image-20230424192313383.png)
+![image-20230424192313383](images/KubernetesInstallBinary/image-20230424192313383.png "bg-black")
 
 
 
@@ -899,7 +899,7 @@ kubectl config use-context system:kube-controller-manager@kubernetes --kubeconfi
 
 生成证书如图所示：
 
-![image-20230424194553904](images/KubernetesInstallBinary/image-20230424194553904.png)
+![image-20230424194553904](images/KubernetesInstallBinary/image-20230424194553904.png "bg-black")
 
 
 
@@ -1033,7 +1033,7 @@ kubectl config use-context system:kube-scheduler@kubernetes --kubeconfig=/ezops/
 
 生成证书如图所示：
 
-![image-20230424195815128](images/KubernetesInstallBinary/image-20230424195815128.png)
+![image-20230424195815128](images/KubernetesInstallBinary/image-20230424195815128.png "bg-black")
 
 
 
@@ -1121,7 +1121,7 @@ kubectl get cs
 
 如图所示：
 
-![image-20230424201219821](images/KubernetesInstallBinary/image-20230424201219821.png)
+![image-20230424201219821](images/KubernetesInstallBinary/image-20230424201219821.png "bg-black")
 
 
 
@@ -1459,7 +1459,7 @@ systemctl status kubelet
 
 此时会自动从 Master 中生成 kubelet.kubeconfig 等证书，如图所示：
 
-![image-20230424220012364](images/KubernetesInstallBinary/image-20230424220012364.png)
+![image-20230424220012364](images/KubernetesInstallBinary/image-20230424220012364.png "bg-black")
 
 <br>
 
@@ -1473,7 +1473,7 @@ kubectl get nodes
 
 如图所示：
 
-![image-20230424220130266](images/KubernetesInstallBinary/image-20230424220130266.png)
+![image-20230424220130266](images/KubernetesInstallBinary/image-20230424220130266.png "bg-black")
 
 <br>
 
@@ -1487,31 +1487,408 @@ kubectl get csr
 kubectl certificate approve 申请名称
 ```
 
+到此，Kubelet 安装配置完成！
+
+
+
+## 配置 Kube-proxy
+
+ Kube-proxy 是实现 Kubernetes Service 的通信与负载均衡机制的重要组件。
+
+
+
+### 创建 Service Account
+
+执行服务器：`master-01`
+
+```bash
+kubectl -n kube-system create serviceaccount kube-proxy
+kubectl create clusterrolebinding system:kube-proxy --clusterrole system:node-proxier --serviceaccount kube-system:kube-proxy
+```
+
+
+
+### 生成 Kube-proxy 配置
+
+生成 `kube-proxy.kubeconfig`，需要在 master 节点上执行，因为需要集群信息。
+
+执行服务器：`master-01`
+
+```bash
+# 获取 Token
+SECRET=$(kubectl -n kube-system get sa/kube-proxy --output=jsonpath='{.secrets[0].name}')
+JWT_TOKEN=$(kubectl -n kube-system get secret/$SECRET --output=jsonpath='{.data.token}' | base64 -d)
+
+# 生成 kubeconfig
+kubectl config set-cluster kubernetes --certificate-authority=/ezops/cert/kubernetes/ca.pem --embed-certs=true --server=https://192.168.2.100:6443 --kubeconfig=/ezops/cert/kubernetes/kube-proxy.kubeconfig
+
+kubectl config set-credentials kubernetes --token=${JWT_TOKEN} --kubeconfig=/ezops/cert/kubernetes/kube-proxy.kubeconfig
+
+kubectl config set-context kubernetes --cluster=kubernetes --user=kubernetes --kubeconfig=/ezops/cert/kubernetes/kube-proxy.kubeconfig
+
+kubectl config use-context kubernetes --kubeconfig=/ezops/cert/kubernetes/kube-proxy.kubeconfig
+```
+
+创建完成后发送给 `ops` 服务器：
+
+```bash
+scp /ezops/cert/kubernetes/kube-proxy.kubeconfig root@192.168.2.201:/ezops/cert/kubernetes/
+```
+
+
+
+### 添加 Kube-proxy 主配置
+
+执行服务器：`ops`
+
+```bash
+cat > kube-proxy.yaml << EOF
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+bindAddress: 0.0.0.0
+clientConnection:
+  acceptContentTypes: ""
+  burst: 10
+  contentType: application/vnd.kubernetes.protobuf
+  kubeconfig: /ezops/cert/kubernetes/kube-proxy.kubeconfig
+  qps: 5
+clusterCIDR: 172.16.0.0/12 
+configSyncPeriod: 15m0s
+conntrack:
+  max: null
+  maxPerCore: 32768
+  min: 131072
+  tcpCloseWaitTimeout: 1h0m0s
+  tcpEstablishedTimeout: 24h0m0s
+enableProfiling: false
+healthzBindAddress: 0.0.0.0:10256
+hostnameOverride: ""
+iptables:
+  masqueradeAll: false
+  masqueradeBit: 14
+  minSyncPeriod: 0s
+  syncPeriod: 30s
+ipvs:
+  masqueradeAll: true
+  minSyncPeriod: 5s
+  scheduler: "rr"
+  syncPeriod: 30s
+kind: KubeProxyConfiguration
+metricsBindAddress: 127.0.0.1:10249
+mode: "ipvs"
+nodePortAddresses: null
+oomScoreAdj: -999
+portRange: ""
+udpIdleTimeout: 250ms
+EOF
+```
+
+
+
+### 添加 Kube-proxy 启动
+
+执行服务器：`ops`
+
+```bash
+cat > kube-proxy.service << EOF
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/kubernetes/kubernetes
+After=network.target
+
+[Service]
+ExecStart=/ezops/service/kubernetes/ROLE_NAME/bin/kube-proxy \\
+  --config=/ezops/service/kubernetes/ROLE_NAME/conf/kube-proxy.yaml
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+和 Kubelet 一样，因为目录结构的原因，需要使用 `ROLE_NAME` 占位。
+
+
+
+### 分发 Kube-proxy 配置
+
+执行服务器：`ops`
+
+```bash
+# Master
+scp kube-proxy* root@192.168.2.221:/ezops/cert/kubernetes/
+scp kube-proxy* root@192.168.2.222:/ezops/cert/kubernetes/
+scp kube-proxy* root@192.168.2.223:/ezops/cert/kubernetes/
+
+# Worker
+scp kube-proxy* root@192.168.2.231:/ezops/cert/kubernetes/
+scp kube-proxy* root@192.168.2.232:/ezops/cert/kubernetes/
+scp kube-proxy* root@192.168.2.233:/ezops/cert/kubernetes/
+```
+
+
+
+### 调整 Kube-proxy 目录
+
+Master 节点的目录结构调整。
+
+执行服务器：`所有 Master`
+
+```bash
+# 修改配置
+cd /ezops/cert/kubernetes
+sed -i "s#ROLE_NAME#server#g" kube-proxy.service
+mv kube-proxy.service kube-proxy.yaml /ezops/service/kubernetes/server/conf/
+ln -s /ezops/service/kubernetes/server/conf/kube-proxy.service /etc/systemd/system/kube-proxy.service
+```
+
+<br>
+
+Worker 节点的目录结构调整。
+
+执行服务器：`所有 Worker`
+
+```bash
+# 修改配置
+cd /ezops/cert/kubernetes
+sed -i "s#ROLE_NAME#node#g" kube-proxy.service
+mv kube-proxy.service kube-proxy.yaml /ezops/service/kubernetes/node/conf/
+ln -s /ezops/service/kubernetes/node/conf/kube-proxy.service /etc/systemd/system/kube-proxy.service
+```
+
+
+
+### 启动 Kubelet
+
+执行服务器：`所有 Master 和 Worker`
+
+```bash
+systemctl daemon-reload
+systemctl enable --now kube-proxy
+systemctl status kube-proxy
+```
+
+到此，Kube-proxy 安装配置完成！
 
 
 
 
 
+## 部署 Calico
+
+由于没有网络插件，集群中的节点都处于 NotReady 状态。
+
+执行服务器：`master-01`
+
+```bash
+# 创建插件目录
+mkdir /ezops/service/kubernetes/addons/calico
+cd /ezops/service/kubernetes/addons/calico
+
+# 下载资源清单
+wget https://projectcalico.docs.tigera.io/archive/v3.25/manifests/calico.yaml
+
+# 应用部署
+kubectl apply -f calico.yaml
+```
+
+拉取镜像会很慢，这一步因为网络原因可能会很耗时，部署完成后如图所示：
+
+![image-20230425012322694](images/KubernetesInstallBinary/image-20230425012322694.png "bg-black")
 
 
 
 
 
+## 部署 CoreDNS
+
+Kubernetes 集群需要一个内网解析服务，官方使用的是 CoreDNS。
+
+
+
+### 安装配置 CoreDNS
+
+执行服务器：`master-01`
+
+```bash
+cd /ezops/service/kubernetes/addons/
+
+# 拉取代码
+git clone https://github.com/coredns/deployment.git
+
+# 修改名称
+mv deployment coredns
+cd coredns/kubernetes
+```
+
+修改副本数配置文件 `coredns.yaml.sed`：
+
+```yaml
+...
+spec:
+  # replicas: not specified here:
+  # 1. Default is 1.
+  # 2. Will be tuned in real time if DNS horizontal auto-scaling is turned on.
+  # 添加副本数配置
+  replicas: 2
+...
+```
+
+部署 CoreDNS：
+
+```bash
+# 应用部署
+./deploy.sh -s -i 10.10.10.10 | kubectl apply -f -
+```
+
+注意 Service IP 是之前设置的 `10.10.10.10`，结果如图所示：
+
+![image-20230425012927510](images/KubernetesInstallBinary/image-20230425012927510.png "bg-black")
+
+
+
+### 验证 CoreDNS 解析
+
+执行服务器：`master-01`
+
+```bash
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.28
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
+EOF
+```
+
+测试解析：
+
+```bash
+kubectl exec busybox -n default -- nslookup kubernetes
+```
+
+如图所示：
+
+![image-20230425013106931](images/KubernetesInstallBinary/image-20230425013106931.png "bg-black")
 
 
 
 
 
+## 部署 Dashboard（按需）
 
+执行服务器：`master-01`
 
+```bash
+mkdir /ezops/service/kubernetes/addons/dashboard
+cd /ezops/service/kubernetes/addons/dashboard
 
+# 由于 raw.githubusercontent.com 访问不到，所以加了个 github proxy 的代理
+wget https://ghproxy.com/https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+mv recommended.yaml dashboard.yaml
+```
 
+<br>
 
+修改配置文件的 Service 配置：
 
+```yaml
+...
+spec:
+  ports:
+    - port: 443
+      targetPort: 8443
+  selector:
+    k8s-app: kubernetes-dashboard
+  # 加上 type=NodePort 变成 NodePort 类型的服务
+  type: NodePort
+```
 
+<br>
 
+应用配置：
 
+```bash
+kubectl apply -f dashboard.yaml
+```
 
+Dashboard 集成了一个 metrics-scraper 的组件，可以通过 Kubernetes 的 Metrics API 收集一些基础资源的监控信息，并在 web 页面上展示，所以要想在页面上展示监控信息就需要提供 Metrics API，比如安装 Metrics Server，这部分内容放到后面，结果如图所示：
+
+![image-20230425013611885](images/KubernetesInstallBinary/image-20230425013611885.png "bg-black")
+
+<br>
+
+查看映射的端口：
+
+```bash
+kubectl get svc -n kubernetes-dashboard
+```
+
+本文映射的端口是 `35768`，访问测试：
+
+> https://192.168.2.221:35768/#/login
+
+如图所示：
+
+![image-20230425014036347](images/KubernetesInstallBinary/image-20230425014036347.png "border")
+
+<br>
+
+创建一个全局访问用户：
+
+```bash
+cd /ezops/service/kubernetes/addons/dashboard
+
+# 资源清单
+cat > dashboard-admin.yaml << EOF
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: admin
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: admin
+  namespace: kubernetes-dashboard
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin
+  namespace: kubernetes-dashboard
+EOF
+
+# 应用
+kubectl apply -f dashboard-admin.yaml
+
+# 获取 token
+kubectl get secret -n kubernetes-dashboard | grep admin-token
+```
+
+将获取到的 Token 生成 64 位字符串：
+
+```bash
+# 生成 base64 字符串
+kubectl get secret <获取到的admin-token> -o jsonpath={.data.token} -n kubernetes-dashboard | base64 -d
+```
+
+然后用上面的 base64 解码后的字符串作为 token 登录 Dashboard 即可，注意要复制全：
+
+![image-20230425014334154](images/KubernetesInstallBinary/image-20230425014334154.png "border")
+
+到此，二进制基础集群环境搭建完成！
 
 
 
