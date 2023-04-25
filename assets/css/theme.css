@@ -831,3 +831,15 @@ code::-webkit-scrollbar-track {
 .theme-dm-name {
     line-height: 60px;
 }
+
+.search h2 {
+    font-size: 14px !important;
+}
+
+.search p {
+    font-size: 12px !important;
+}
+
+.search .search-keyword {
+    color: #c82333 !important;
+}

@@ -4,6 +4,8 @@
   * [集群安装：初始化](docs/kubernetes/KubernetesClusterInitialize.md)
   * [集群安装：Kubeadm（测试）](docs/kubernetes/KubernetesInstallKubeadm.md)
   * [集群安装：二进制（生产）](docs/kubernetes/KubernetesInstallBinary.md)
+  * [资源清单](docs/kubernetes/KubernetesResouceInventory.md)
+  * [资源对象：Pod](docs/kubernetes/KubernetesPod.md)
   
   
 
