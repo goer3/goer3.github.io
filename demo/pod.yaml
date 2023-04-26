@@ -1,21 +1,20 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
 metadata:
-  name: job-demo
+  name: hpa-nginx-demo
 spec:
-  # 限制任务运行的最长时间
-  activeDeadlineSeconds: 100
-  # 任务失败重建 Pod 的次数，默认 6，重建 Pod 的间隔呈指数增加，即 10s、20s、40s...
-  backoffLimit: 10
-  # 定义 Job 最多可以有多少 Pod 同时运行
-  parallelism: 2
-  # 定义 Job 至少要完成的 Pod 数目
-  completions: 5
-  template:
-    spec:
-      containers:
-      - name: busybox
-        image: busybox
-        command: ["/bin/sh",  "-c", "echo 'Hello World'"]
-      # 重启策略必须是 Never，设置 OnFailure，则 Job 执行失败后不会创建新的 Pod，只会不断重启 Pod
-      restartPolicy: Never
+  # 指定 Deployment
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: deploy-nginx-demo
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    # 指定指标
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 10

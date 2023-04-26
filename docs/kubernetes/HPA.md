@@ -194,31 +194,136 @@ kubectl top node
 
 ## 使用 HPA（命令行）
 
+先创建一个 Deployment 用于测试：
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-nginx-demo
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+```
+
+创建完成会默认启动一个 Pod，然后基于该 Deployment 创建 HPA：
+
+```bash
+kubectl autoscale deployment deploy-nginx-demo --cpu-percent=10 --min=1 --max=5
+```
+
+参数说明：
+
+* `--cpu-percent`：当 CPU 使用了大于 10% 的时候开始执行扩容集群。
+* `--min`：指定最小副本数。
+* `--max`：指定最大副本数。
+
+如图所示：
+
+![image-20230427012125799](images/HPA/image-20230427012125799.png)
+
+此时 `TARGETS` 字段显示 `unknow` 是有问题的。
+
+<br>
+
+通过查看 Pod 报错信息可以看到：
+
+> Warning  FailedGetResourceMetric       13s (x2 over 28s)  horizontal-pod-autoscaler  failed to get cpu utilization: missing request for cpu in container nginx of Pod deploy-nginx-demo-7f456874f4-h4fqd
+>   Warning  FailedComputeMetricsReplicas  13s (x2 over 28s)  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: missing request for cpu in container nginx of Pod deploy-nginx-demo-7f456874f4-h4fqd
+
+原因在于定义资源清单的时候，没有配置资源限制。所以想要使用 HPA，必须要有资源限制。
+
+调整资源清单添加配置：
+
+```yaml
+...
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 50m
+            memory: 50Mi
+        ports:
+        - containerPort: 80
+```
+
+应用更新之后删除 HPA 重新创建，完成后再度查看：
+
+![image-20230427012910326](images/HPA/image-20230427012910326.png)
+
+此时 `TARGETS` 字段恢复正常。
 
 
 
 
 
+## 测试 HPA
+
+模拟访问 Nginx：
+
+```bash
+while true; do wget -q -O- 172.16.184.75;done
+```
+
+可以看到 CPU 飙升，新的 Pod 被创建：
+
+![image-20230427013253354](images/HPA/image-20230427013253354.png)
+
+最终一共运行 5 个副本，达到设置的 `--max` 的值。原因在于上面的请求一直请求的是同一个节点，即使扩容了，该节点的 CPU 并没有下降。
+
+此时停止访问，CPU 会很快降下来，但是 Pod 并不会立即缩容，默认有 5 分钟观察期，这是一种保护机制，避免因为临时降低而反复创建删除 Pod。
+
+想要修改 HPA 观察期时间，可以在 Controller Manager 中修改 `--horizontal-pod-autoscaler-downscale-stabilization`，默认 5 分钟。
 
 
 
 
 
+## 使用 HPA（资源清单）
 
+资源清单示例：
 
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-nginx-demo
+spec:
+  # 指定 Deployment
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: deploy-nginx-demo
+  # 最小副本数
+  minReplicas: 1
+  # 最大副本数
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    # 指定指标
+    resource:
+      name: cpu
+      target:
+      	# 使用率，支持 Utilization, Value, AverageValue
+        type: Utilization
+        averageUtilization: 10
+```
 
+注意：一个 Deployment 只能绑定一个 HPA。
 
-
-
-
-
-
-
-
-
-
-
-
+除了 HPA 以外，还有 VPA，也就是垂直扩容，和 HPA 不同在于不是增加 Pod 而是在原有 Pod 身上增加资源配置。
 
 
 
