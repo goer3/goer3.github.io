@@ -66,7 +66,7 @@ kubectl describe cm cm-demo
 
 如图所示：
 
-![image-20230427121549273](images/ManageConfig/image-20230427121549273.png)
+![image-20230427121549273](images/ManageConfig/image-20230427121549273.png "bg-black")
 
 
 
@@ -136,7 +136,7 @@ kubectl logs busybox-demo
 
 如图所示：
 
-![image-20230427164704831](images/ManageConfig/image-20230427164704831.png)
+![image-20230427164704831](images/ManageConfig/image-20230427164704831.png "bg-black")
 
 可以看到，对于配置文件类型依旧被当成一个值赋值给了环境变量。
 
@@ -176,7 +176,7 @@ spec:
 
 创建后查看日志如图所示：
 
-![image-20230427170134321](images/ManageConfig/image-20230427170134321.png)
+![image-20230427170134321](images/ManageConfig/image-20230427170134321.png "bg-black")
 
 当使用数据卷的方式挂载到 Pod 中，此时更新 ConfigMap，挂载的数据也是会跟着热更新。
 
@@ -226,7 +226,7 @@ echo -n admin123 | base64
 
 如图所示：
 
-![image-20230427171941669](images/ManageConfig/image-20230427171941669.png)
+![image-20230427171941669](images/ManageConfig/image-20230427171941669.png "bg-black")
 
 使用 data 的方式创建 Secret：
 
@@ -256,17 +256,17 @@ stringData:
 
 查看创建结果：
 
-![image-20230427173046071](images/ManageConfig/image-20230427173046071.png)
+![image-20230427173046071](images/ManageConfig/image-20230427173046071.png "bg-black")
 
 查看配置信息：
 
-![image-20230427172542077](images/ManageConfig/image-20230427172542077.png)
+![image-20230427172542077](images/ManageConfig/image-20230427172542077.png "bg-black")
 
 可以看到两种方式创建的 Serect 的  value 部分都不会直接显示。
 
 如果想要获取内容，可以将其输出为 yaml 就能看到，不过都是 base64 之后的值，然后通过 base64 解密。
 
-![image-20230427172804936](images/ManageConfig/image-20230427172804936.png)
+![image-20230427172804936](images/ManageConfig/image-20230427172804936.png "bg-black")
 
 base64 解密方法：
 
@@ -292,7 +292,7 @@ stringData:
 
 这样所以配置会被当成一个整体加密。如图所示：
 
-![image-20230427173721444](images/ManageConfig/image-20230427173721444.png)
+![image-20230427173721444](images/ManageConfig/image-20230427173721444.png "bg-black")
 
 
 
@@ -325,7 +325,7 @@ spec:
 
 创建后结果如图所示：
 
-![image-20230427174301430](images/ManageConfig/image-20230427174301430.png)
+![image-20230427174301430](images/ManageConfig/image-20230427174301430.png "bg-black")
 
 可以看到 Pod 中拿到的值已经被解析成明文了。
 
@@ -359,7 +359,7 @@ spec:
 
 查看如图所示：
 
-![image-20230427175132031](images/ManageConfig/image-20230427175132031.png)
+![image-20230427175132031](images/ManageConfig/image-20230427175132031.png "bg-black")
 
 
 
@@ -483,20 +483,165 @@ kubectl create secret tls secret-demo9 --cert=/path/cert --key=/path/key
 
 ### kubernetes.io/service-account-token
 
-`ServiceAccount` 是 Pod 和集群 API Server 通讯的访问凭证。`kubernetes.io/service-account-token` 这种类型就是主要给 ServiceAccount 使用。ServiceAccount 在创建时会默认创建对应的 Secret。当然，新版本已经需要添加相应的配置了。
+`ServiceAccount` 是 Pod 和集群 API Server 通讯的访问凭证。
 
-查看任意一个 Pod：
+`kubernetes.io/service-account-token` 这种类型就是主要给 ServiceAccount 使用。ServiceAccount 在创建时会默认创建对应的 Secret。每一个名称空间下都会有一个默认的 ServiceAccount 和一个与之绑定的 Secret。
+
+![image-20230428000852663](images/ManageConfig/image-20230428000852663.png "bg-black")
+
+当创建 Pod 的时候，如果没有指定 ServiceAccount，Pod 就会使用当前名称空间中名为 default 的 ServiceAccount。
+
+<br>
+
+运行一个 Pod 然后查看创建之后的资源清单：
 
 ```bash
-kubectl get pod pod-demo -o yaml
+kubectl run nginx --image=nginx
+kubectl get pod nginx -o yaml
 ```
 
-可以看到：
+可以看到关于 ServiceAccount 的信息：
 
-* 当创建 Pod 的时候，如果没有指定 ServiceAccount，Pod 则会使用默认名称空间中名称为 default 的 ServiceAccount。
-* volumes 字段中有一个 `projected` 类型的 volume 被挂载到了 `/var/run/secrets/kubernetes.io/serviceaccount`，该类型的 volume 可以同时挂载多个来源的数据。默认挂载了 configMap，downwardAPI，serviceAccountToken。
+```yaml
+...
+spec:
+  ...
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-82ffk
+      ...
+  serviceAccount: default
+  serviceAccountName: default
+  ...
+  volumes:
+  - name: kube-api-access-82ffk
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+```
 
-更多信息由于需要等到学习了 ServiceAccount 的时候才能搞得清楚。
+可以看到这样几个关于 ServiceAccount 的信息：
+
+* 因为没指定 Service Account，所以 `serviceAccountName` 字段使用了默认的 default。
+* 默认自动定义了一个类型为 `projected` 的 Volume，该类型支持同时挂载多个来源的数据。这里有三个来源：
+  * downwardAPI：获取 namespace。
+  * configMap：获取 ca.crt 证书。
+  * serviceAccountToken：也就是 ServiceAccount。
+
+挂载后在容器 `/var/run/secrets/kubernetes.io/serviceaccount` 目录如图所示：
+
+![image-20230427235641082](images/ManageConfig/image-20230427235641082.png "bg-black")
+
+<br>
+
+当然，用户也可以通过在 ServiceAccount 或者 Pod 上配置不自动挂载 ServiceAccount API 凭据：
+
+```yaml
+# ServiceAccount 示例
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo
+automountServiceAccountToken: false
+...
+---
+# Pod 示例
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo
+spec:
+  serviceAccountName: demo
+  automountServiceAccountToken: false
+  ...
+```
+
+
+
+### ServiceAccount Token
+
+ServiceAccount 是 Pod 和集群 API Server 通讯的访问凭证，传统方式下，在 Pod 中使用 ServiceAccount 可能存在以下风险：
+
+- ServiceAccount 中的 JWT 没有绑定 audience 身份，因此所有 ServiceAccount 的使用者都可以彼此扮演，存在伪装攻击的可能。
+- 传统方式下，每一个 ServiceAccount 都需要存储在一个对应的 Secret 中，并且会以文件形式存储在对应的应用节点上。而集群的系统组件在运行过程中也会使用到一些权限很高的 ServiceAccount，其增大了集群管控平面的攻击面，攻击者可以通过获取这些管控组件使用的 ServiceAccount 非法提权。
+- ServiceAccount 中的 JWT token 没有设置过期时间，当上述 ServiceAccount 泄露情况发生时，只能通过轮转 ServiceAccount 的签发私钥来进行防范。
+- 每一个 ServiceAccount 都需要创建一个与之对应的 Secret，在大规模的应用部署下存在弹性和容量风险。
+
+为解决这个问题，Kubernetes 提供了 `ServiceAccount Token` 特性用于增强 ServiceAccount 的安全性。
+
+该方案可使 Pod 支持以卷投影的形式将 ServiceAccount 挂载到容器中，从而避免了对 Secret 的依赖。
+
+同时 ServiceAccount Token 还受时间限制（`expirationSeconds`），受 audience 约束，并且不与 Secret 对象关联。如果删除 Pod 或删除 ServiceAccount，则这些 Token 将无效，从而可以防止任何误用。
+
+Kubelet 还会在 Token 即将到期时自动更新 Token。
+
+此功能在 Kubernetes 1.12 中引入，v1.20 稳定，想要开启，需要修改 API Server 设置以下命令行参数，Kubeadm 集群默认开启。
+
+```bash
+# serviceaccount token 中的签发身份，即 token payload 中的 iss 字段
+--service-account-issuer
+# token 私钥文件路径
+--service-account-key-file
+# token 签名私钥文件路径
+--service-account-signing-key-file
+# 可选参数，合法的请求 token 身份，用于 API Server 服务端认证请求 token 是否合法
+--api-audiences
+```
+
+如果是按照我这里的二进制安装方法，也已经开启该功能。
+
+已经开启配置集群就可以指定 Token 所需属性，例如身份和有效时间。
+
+使用示例：
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-demo
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    volumeMounts:
+    # 挂在自定义的目录
+    - mountPath: /var/run/secrets/tokens
+      name: v-token
+  serviceAccountName: sa-demo
+  volumes:
+  - name: v-token
+    projected:
+      sources:
+      # 设置过期时间和身份
+      - serviceAccountToken:
+          path: token
+          expirationSeconds: 7200
+          audience: vault
+```
+
+Kubelet 组件会替 Pod 请求 Token 并将其保存起来以供 Pod 内可用，并在 Token 快要到期的时候刷新它。 
+
+一般刷新时间在 TTL 的 80% 的时候，或生命期超过 24 小时的时候主动轮换它。然后应用程序负责在 Token 被轮换时重新加载其内容。
 
 
 

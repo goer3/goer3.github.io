@@ -8,9 +8,10 @@
   * [资源对象：Pod](docs/kubernetes/Pod.md)
   * [基础控制器](docs/kubernetes/BaseController.md)
   * [HPA](docs/kubernetes/HPA.md)
-  * [准入控制器：Admission](docs/kubernetes/AdmissionController.md)
-  * [用户自定义资源：CRD](docs/kubernetes/CRD.md)
-  * [ConfigMap / Secret](docs/kubernetes/ManageConfig.md)
+  * [Admission](docs/kubernetes/AdmissionController.md)
+  * [CRD](docs/kubernetes/CRD.md)
+  * [ConfigMap / Secret / SA](docs/kubernetes/ManageConfig.md)
+  * [RBAC](docs/kubernetes/RBAC.md)
   
   
   
