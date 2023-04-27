@@ -176,7 +176,7 @@ kubectl get apiservice
 
 如图所示：
 
-![image-20230427010224845](images/HPA/image-20230427010224845.png)
+![image-20230427010224845](images/HPA/image-20230427010224845.png "bg-black")
 
 配置正常后就能使用 top 命令查看集群信息了：
 
@@ -186,7 +186,7 @@ kubectl top node
 
 如图所示：
 
-![image-20230427010404877](images/HPA/image-20230427010404877.png)
+![image-20230427010404877](images/HPA/image-20230427010404877.png "bg-black")
 
 
 
@@ -231,7 +231,7 @@ kubectl autoscale deployment deploy-nginx-demo --cpu-percent=10 --min=1 --max=5
 
 如图所示：
 
-![image-20230427012125799](images/HPA/image-20230427012125799.png)
+![image-20230427012125799](images/HPA/image-20230427012125799.png "bg-black")
 
 此时 `TARGETS` 字段显示 `unknow` 是有问题的。
 
@@ -261,7 +261,7 @@ kubectl autoscale deployment deploy-nginx-demo --cpu-percent=10 --min=1 --max=5
 
 应用更新之后删除 HPA 重新创建，完成后再度查看：
 
-![image-20230427012910326](images/HPA/image-20230427012910326.png)
+![image-20230427012910326](images/HPA/image-20230427012910326.png "bg-black")
 
 此时 `TARGETS` 字段恢复正常。
 
@@ -279,7 +279,7 @@ while true; do wget -q -O- 172.16.184.75;done
 
 可以看到 CPU 飙升，新的 Pod 被创建：
 
-![image-20230427013253354](images/HPA/image-20230427013253354.png)
+![image-20230427013253354](images/HPA/image-20230427013253354.png "bg-black")
 
 最终一共运行 5 个副本，达到设置的 `--max` 的值。原因在于上面的请求一直请求的是同一个节点，即使扩容了，该节点的 CPU 并没有下降。
 

@@ -1,20 +1,19 @@
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
+apiVersion: v1
+kind: Pod
 metadata:
-  name: hpa-nginx-demo
+  name: busybox-demo
 spec:
-  # 指定 Deployment
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: deploy-nginx-demo
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-  - type: Resource
-    # 指定指标
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 10
+  containers:
+  - name: busybox
+    image: busybox
+    args: ["/bin/sh", "-c", "cd /data/config && cat config.yaml"]
+    volumeMounts:
+      - name: v-secret-demo
+        mountPath: /data/config
+  volumes:
+    - name: v-secret-demo
+      secret:
+        secretName: secret-demo3
+        items:
+          - key: config.yaml
+            path: config.yaml
