@@ -71,7 +71,7 @@ spec:
 
 运行 Pod 查看效果：
 
-![image-20230428182012039](images/SecurityContext/image-20230428182012039.png)
+![image-20230428182012039](images/SecurityContext/image-20230428182012039.png "bg-black")
 
 id 查看到当前登录用户，组信息都变成 Security Context 设置。同时挂载的目录所属组也是设置的 fsGroup。运行的进行用户也是设置 runAsUser。
 

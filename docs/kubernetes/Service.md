@@ -15,7 +15,7 @@ kubectl get node --show-labels
 
 使用 `--show-lables` 也可以用来查看 Pod 的标签。
 
-![image-20230429001801714](images/Service/image-20230429001801714.png)
+![image-20230429001801714](images/Service/image-20230429001801714.png "bg-black")
 
 其中 `kubernetes.io/os=linux` 标签是一个常用的标签，如果集群包括多种系统，该标签可以用来标识系统。
 
@@ -35,7 +35,7 @@ kubectl label nodes worker-03 role=worker
 
 查看打的标签：
 
-![image-20230429002218909](images/Service/image-20230429002218909.png)
+![image-20230429002218909](images/Service/image-20230429002218909.png "bg-black")
 
 
 
@@ -183,7 +183,7 @@ spec:
 
 如图所示：
 
-![image-20230429012715434](images/Service/image-20230429012715434.png)
+![image-20230429012715434](images/Service/image-20230429012715434.png "bg-black")
 
 
 
@@ -211,7 +211,7 @@ spec:
 
 创建结果如图所示：
 
-![image-20230429004907374](images/Service/image-20230429004907374.png)
+![image-20230429004907374](images/Service/image-20230429004907374.png "bg-black")
 
 每一个名称空间下都会有一个叫做 `kubernetes` 的 Service。
 
@@ -249,7 +249,7 @@ spec:
 
 如图所示：
 
-![image-20230429013308592](images/Service/image-20230429013308592.png)
+![image-20230429013308592](images/Service/image-20230429013308592.png "bg-black")
 
 用户可以通过 Service IP + Service 端口访问，也可以任意节点 IP + nodePort 访问。
 
@@ -277,7 +277,7 @@ spec:
 
 这样做的好处在于，即使后期这个数据库的连接地址变了，也不用更新应用程序中的数据库地址配置，只需要修改这个 Service 即可。
 
-![image-20230429014323964](images/Service/image-20230429014323964.png)
+![image-20230429014323964](images/Service/image-20230429014323964.png "bg-black")
 
 
 
@@ -317,7 +317,7 @@ subsets:
 
 如图所示：
 
-![image-20230429014918377](images/Service/image-20230429014918377.png)
+![image-20230429014918377](images/Service/image-20230429014918377.png "bg-black")
 
 此时在集群中就可以通过 Service 的解析地址访问到集群外的 ETCD 服务了。
 
