@@ -1,8 +1,29 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: ingress-nginx-tcp-service
-data:
-  "16379": "default/svc-redis-demo:6379"
-
-
+  name: deploy-podaffinity
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: nginx-podaffinity
+  template:
+    metadata:
+      labels:
+        app: nginx-podaffinity
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - "busybox"
+              topologyKey: kubernetes.io/hostname

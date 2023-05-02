@@ -792,7 +792,7 @@ metadata:
   # 名称空间为 ingress-nginx 的名称空间
   namespace: ingress-nginx
 data:
-  "16379": "default/svc-redis-demo:6379"
+  16379: "default/svc-redis-demo:6379"
 ```
 
 
@@ -858,6 +858,8 @@ kubectl exec -it ingress-nginx-controller-8xgd9 -n ingress-nginx -- cat /etc/ngi
 
 支持的全局参数可以参考文档：
 
-> https://docs.nginx.com/nginx-ingress-controller/configuration/global-configuration/configmap-resource/
+> https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
 
+其它特殊的配置可以参考：
 
+> https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
