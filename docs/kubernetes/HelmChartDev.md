@@ -104,7 +104,7 @@ helm install --generate-name chart-demo/ --dry-run
 
 可以看到生成的资源清单：
 
-![image-20230503142157591](images/HelmChartDev/image-20230503142157591-1683095874094.png)
+![image-20230503142157591](images/HelmChartDev/image-20230503142157591-1683095874094.png "bg-black")
 
 可以看到 ConfigMap 的名称也获取到了 generate 生成的 release 名称。
 
@@ -144,7 +144,7 @@ data:
 
 试运行结果：
 
-![image-20230503150940194](images/HelmChartDev/image-20230503150940194.png)
+![image-20230503150940194](images/HelmChartDev/image-20230503150940194.png "bg-black")
 
 
 
@@ -212,7 +212,7 @@ data:
 
 试运行结果：
 
-![image-20230503152337928](images/HelmChartDev/image-20230503152337928.png)
+![image-20230503152337928](images/HelmChartDev/image-20230503152337928.png "bg-black")
 
 
 
@@ -333,7 +333,7 @@ data:
 
 需要注意的是，由于 if 这些语句也会占用一行，所有最后生成资源清单可能会存在很多空白行。可以在关键字前面添加 `-` 删除这些空白行。试运行结果：
 
-![image-20230503163311488](images/HelmChartDev/image-20230503163311488.png)
+![image-20230503163311488](images/HelmChartDev/image-20230503163311488.png "bg-black")
 
 
 
@@ -367,7 +367,7 @@ data:
 
 该方法可以方便复杂层级的使用，试运行结果：
 
-![image-20230503163715495](images/HelmChartDev/image-20230503163715495.png)
+![image-20230503163715495](images/HelmChartDev/image-20230503163715495.png "bg-black")
 
 
 
@@ -401,7 +401,7 @@ data:
 
 试运行结果：
 
-![image-20230503164410150](images/HelmChartDev/image-20230503164410150.png)
+![image-20230503164410150](images/HelmChartDev/image-20230503164410150.png "bg-black")
 
 也可以直接对循环：
 
