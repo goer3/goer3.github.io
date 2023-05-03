@@ -1,29 +1,9 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: deploy-podaffinity
-spec:
-  replicas: 5
-  selector:
-    matchLabels:
-      app: nginx-podaffinity
-  template:
-    metadata:
-      labels:
-        app: nginx-podaffinity
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - "busybox"
-              topologyKey: kubernetes.io/hostname
+  name: {{ .Release.Name }}
+data:
+  languages: |-
+  {{- range .Values.dev.languages }}
+    - {{ . | lower }}
+  {{- end }}

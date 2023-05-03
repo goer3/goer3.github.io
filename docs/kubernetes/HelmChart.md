@@ -21,7 +21,7 @@ chart-name/
 
 
 
-### Chart.yaml
+## Chart.yaml
 
 对于一个 Chart 包来说 `Chart.yaml` 文件是必须的，它包含下面的这些字段：
 
@@ -53,25 +53,25 @@ deprecated: chart 是否已被弃用 (可选, boolean)
 
 
 
-### LICENSE
+## LICENSE
 
 LICENSE 是一个纯文本文件，其中包含 Chart 的许可证书。
 
 
 
-### README.md
+## README.md
 
 README.md 文件采用 Markdown 格式编写，一般用于介绍该 Chart 的用途，使用方法等。
 
 
 
-### NOTES.txt
+## NOTES.txt
 
 NOTES.txt 是一个纯文本文件，该文件将在安装后以及查看 release 状态的时候打印出来。常被用于显示使用说明。
 
 
 
-### charts
+## charts
 
 一个 Chart 包可能会依赖许多其他 Chart。这些依赖可以使用 `Chart.yaml` 中的 dependencies 字段动态链接，也可以引入到 `charts/` 目录手动管理。
 
@@ -79,7 +79,7 @@ NOTES.txt 是一个纯文本文件，该文件将在安装后以及查看 releas
 
 
 
-### templates
+## templates
 
 Helm Chart 模板是用 `Go template` 语言进行编写的，另外还额外增加了 `Sprig` 库中的 50 个左右附加模板函数和一些其他 `专用函数`。
 
@@ -124,7 +124,7 @@ spec:
 
 
 
-### Values
+## Values
 
 template 模板资源清单获取 Values 的方式有两种：
 
@@ -161,7 +161,7 @@ values.shema.json 文件和 values.yaml 的用途一样，不过该文件时 JSO
 
 
 
-### crds
+## crds
 
 Kubernetes 提供了一种声明新类型的机制，使用 `CustomResourceDefinitions（CRDS）`，可以让 Kubernetes 开发人员声明自定义资源类型。
 
@@ -201,7 +201,7 @@ cd mysql/
 
 如图所示：
 
-![image-20230502013609840](images/HelmChart/image-20230502013609840.png)
+![image-20230502013609840](images/HelmChart/image-20230502013609840.png "bg-black")
 
 其实就是之前我们写的一些资源清单，然后将里面的也写具体配置项，加入逻辑判断，将 value 抽离出来放到 values.yaml 中。
 
@@ -215,7 +215,7 @@ helm create mychart
 
 如图所示：
 
-![image-20230502013938874](images/HelmChart/image-20230502013938874.png)
+![image-20230502013938874](images/HelmChart/image-20230502013938874.png "bg-black")
 
 该方法通过脚手架创建，可以看到默认是初始化了一些资源清单模板的，只需要对它进行修改即可。
 
@@ -238,143 +238,6 @@ helm template mychart mychart/
 ```
 
 template 如果有些数据要安装之后才初始化的就获取不到，`install --dry-run` 的方式可以。
-
-
-
-
-
-## Chart 开发
-
-以下是 Chart 开发中常用的一些语法和技巧。
-
-
-
-### 内置对象
-
-在模板中使用 `{{ .Release.xxx }}` 可以获取运行 Chart （也叫 release）的相关信息，除此之外 Chart 还包含以下常用内置对象：
-
-- `Release`：该对象描述了 release 本身的相关信息
-  - `Release.Name`：release 名称
-  - `Release.Namespace`：release 安装到的命名空间
-  - `Release.IsUpgrade`：如果当前操作是升级或回滚，是为 true
-  - `Release.IsInstall`：如果当前操作是否是安装，是为 true
-  - `Release.Revision`：release 的 revision 版本号，在安装时为 1，每次升级或回滚都会 +1
-  - `Release.Service`：渲染当前模板的服务，在 Helm 上，实际上该值始终为 Helm
-- `Values`：从 `values.yaml` 文件和用户提供的 values 文件传递到模板的 Values 值
-- `Chart`：获取 `Chart.yaml` 文件的内容，该文件中的任何数据都可以访问
-- `Files`：可以访问 Chart 中的所有非特殊文件，虽然无法使用它来访问模板文件，但是可以来访问 chart 中的其他文件。
-  - `Files.Get`：用于根据名称获取文件（比如 `.Files.Get config.ini`）
-  - `Files.GetBytes`：用于以 bytes 数组而不是字符串的形式来获取文件内容的函数
-  - `Files.Glob`：用于返回名称于给定的 shell glob 模式匹配的文件列表
-  - `Files.Lines`：可以逐行读取文件的函数，对于遍历文件中的每行内容很有用
-  - `Files.AsSecrets`：将文件内容以 Base64 编码的字符串返回的函数
-  - `Files.AsConfig`：将文件正文作为 YAML 字典返回的函数
-- `Capabilities`：获取有关 Kubernetes 集群的信息的对象
-  - `Capabilities.APIVersions`：支持的版本集合
-  - `Capabilities.APIVersions.Has $version`：判断一个版本（比如 `batch/v1`）或资源（比如 `apps/v1/Deployment`）是否可用
-  - `Capabilities.Kube.Version`：Kubernetes 的版本
-  - `Capabilities.Kube`：是 Kubernetes 版本的缩写
-  - `Capabilities.Kube.Major`：Kubernetes 主版本
-  - `Capabilities.Kube.Minor`：Kubernetes 的次版本
-- `Template`：当前正在执行的模板的相关信息
-  - `Name`：当前模板的命名空间文件路径（比如 `mychart/templates/mytemplate.yaml`）
-  - `BasePath`：当前 chart 的模板目录的命名空间路径（比如 `mychart/templates`）
-
-更多具体用法可以参考官方文档：
-
-> https://helm.sh/zh/docs/chart_template_guide/builtin_objects/
-
-
-
-### 函数和管道
-
-通过 Values 获取到的数据不一定就是需要的，可能需要经过一定的处理之后才能正常的使用。此时就需要使用到函数。
-
-Helm 有60多种可用的函数，其中一些是由 Go 模板语言本身定义的，其他大多数都是 Sprig 模板库提供的，一般常用的也就是 Sprig 模板库的函数 。
-
-同时，模板语言有一个强大的功能就是 `管道（Pipeline，流水线）`，它可以让我们一次使用多个函数。
-
-使用示例：
-
-```bash
-# 创建一个 Chart
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

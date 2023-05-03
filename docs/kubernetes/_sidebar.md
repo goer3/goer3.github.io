@@ -33,4 +33,5 @@
 * Helm
   * [Helm](docs/kubernetes/Helm.md)
   * [Chart](docs/kubernetes/HelmChart.md)
+  * [Chart 开发](docs/kubernetes/HelmChartDev.md)
 
