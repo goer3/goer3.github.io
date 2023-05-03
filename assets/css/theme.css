@@ -535,6 +535,12 @@ code::-webkit-scrollbar-track {
     padding: 10px;
 }
 
+.markdown-section p img[title="center"] {
+    clear: both;
+    display: block;
+    margin: 100px auto;
+}
+
 .markdown-section ol,
 .markdown-section ul {
     margin-top: 0;

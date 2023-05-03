@@ -35,3 +35,5 @@
   * [Chart](docs/kubernetes/HelmChart.md)
   * [Chart 开发](docs/kubernetes/HelmChartDev.md)
 
+* 数据持久化
+
