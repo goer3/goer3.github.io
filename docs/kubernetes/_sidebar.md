@@ -18,7 +18,7 @@
   * [Secret / ServiceAccount](docs/kubernetes/Secret.md)
   * [RBAC](docs/kubernetes/RBAC.md)
   * [Security Context](docs/kubernetes/SecurityContext.md)
-  
+
 * 网络服务
   * [Service](docs/kubernetes/Service.md)
   * [DNS](docs/kubernetes/DNS.md)
@@ -26,14 +26,16 @@
   * [Ingress-nginx](docs/kubernetes/Ingress-nginx.md)
   * [Traefik](docs/kubernetes/Traefik.md)
   * [APISIX](docs/kubernetes/APISIX.md)
-  
+
 * 调度器
   * [调度器](docs/kubernetes/Scheduler.md)
-  
+
 * Helm
   * [Helm](docs/kubernetes/Helm.md)
   * [Chart](docs/kubernetes/HelmChart.md)
   * [Chart 开发](docs/kubernetes/HelmChartDev.md)
 
 * 数据持久化
+  * [本地存储](docs/kubernetes/LocalStorage.md)
+  * [OpenEBS](docs/kubernetes/OpenEBS.md)
 

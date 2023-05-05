@@ -110,34 +110,38 @@
             sidebarDom.insertAdjacentElement("afterBegin", userEle);
             // sidebarDom.insertAdjacentElement("beforeEnd", otherEle);
 
-            // observer配置项
-            var observerOptions = {
-              threshold: 0, //目标元素与视窗重叠的阈值（0~1）
-              root: null // 目标视窗即目标元素的父元素，如果没有提供，则默认body元素
-            }
+            // 判断当前屏幕大小
+            if (screen.width > 768) {
+              // observer配置项
+              var observerOptions = {
+                threshold: 0, //目标元素与视窗重叠的阈值（0~1）
+                root: null // 目标视窗即目标元素的父元素，如果没有提供，则默认body元素
+              }
 
-            var target = document.getElementById("id-qqg");
+              var target = document.getElementById("id-qqg");
 
-            // observer 回调函数
-            const observerCallback = (entries) => {
-              entries.forEach(item => {
-                var menuEle = document.getElementsByClassName("sidebar-nav")[0];
-                // 当前元素可见
-                if (item.isIntersecting) {
-                  {
-                    menuEle.classList.remove("theme-fixd-sider");
+              // observer 回调函数
+              const observerCallback = (entries) => {
+                entries.forEach(item => {
+                  var menuEle = document.getElementsByClassName("sidebar-nav")[0];
+                  // 当前元素可见
+                  if (item.isIntersecting) {
+                    {
+                      menuEle.classList.remove("theme-fixd-sider");
+                    }
+                    // observer.unobserve(target)
+                  } else {
+                    menuEle.classList.add("theme-fixd-sider");
+                    // observer.unobserve(target)
                   }
-                  // observer.unobserve(target)
-                } else {
-                  menuEle.classList.add("theme-fixd-sider");
-                  // observer.unobserve(target)
-                }
-              })
-            }
+                })
+              }
 
-            // 实例化观察者对象，根据 QQ 群是否显示决定菜单是否 fixd
-            var observer = new IntersectionObserver(observerCallback, observerOptions);
-            observer.observe(target);
+              // 实例化观察者对象，根据 QQ 群是否显示决定菜单是否 fixd
+              var observer = new IntersectionObserver(observerCallback, observerOptions);
+              observer.observe(target);
+            }
+            
             next(html);
           });
 
