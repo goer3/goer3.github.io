@@ -38,4 +38,5 @@
 * 数据持久化
   * [本地存储](docs/kubernetes/LocalStorage.md)
   * [OpenEBS](docs/kubernetes/OpenEBS.md)
+  * [Ceph](docs/kubernetes/Ceph.md)
 

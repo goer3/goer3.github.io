@@ -93,49 +93,154 @@ OpenEBS 持久化存储卷通过 Kubernetes 的 PV 来创建，使用 iSCSI 来�
 
 
 
+### Jiva
+
+Jiva 存储引擎是基于 Rancher 的 LongHorn 和 gotgt 开发的，采用 GO 语言编写，运行在用户空间。
+
+LongHorn 控制器将传入的 IO 同步复制到 LongHorn 复制器上。复制器考虑以 Linux 稀疏文件为基础，进行动态供应、快照、重建等存储功能。
+
+
+
+### cStor
+
+cStor 数据引擎是用 C 语言编写的，具有高性能的 iSCSI 目标和 `Copy-On-Write` 块系统，可提供数据完整性、数据弹性和时间点快照和克隆。
+
+cStor 具有池功能，可将节点上的磁盘以镜像式或 RAIDZ 模式聚合，以提供更大的容量和性能单位。
+
+
+
+### OpenEBS Local PV
+
+对于那些不需要存储级复制的应用，Local PV 能提供更高的性能。
+
+OpenEBS Local PV 与 Kubernetes Local PV 类似，只不过它是由 OpenEBS 控制平面动态调配的，就像其他常规 PV 一样。
+
+OpenEBS Local PV 有两种类型：
+
+* 主机路径 Local PV：指的是主机上的一个子目录。
+* 设备 Local PV：节点上的一个被发现的磁盘（直接连接或网络连接）。
+
+OpenEBS 引入了一个 Local PV 供应器，用于根据 PVC 和存储类规范中的一些标准选择匹配的磁盘或主机路径。
 
 
 
 
 
+## 节点磁盘管理器
+
+`Node Disk Manager (NDM)` 填补了使用 Kubernetes 管理有状态应用的持久性存储所需的工具链中的空白。
+
+容器时代的架构必须以自动化的方式服务于应用和应用开发者，提供跨环境的弹性和一致性。这意味着存储栈本身必须非常灵活，以便 Kubernetes 和云原生生态系统中的其他软件可以轻松使用这个栈。
+
+NDM 在 Kubernetes 的存储栈中起到了基础性的作用，它将不同的磁盘统一起来，并通过将它们识别为 Kubernetes 对象来提供部分池化的能力。同时， NDM 还可以发现、供应、监控和管理底层磁盘，这样 Kubernetes PV 供应器（如 OpenEBS 和其他存储系统和Prometheus）可以管理磁盘子系统。
+
+![image-20230506155112890](images/OpenEBS/image-20230506155112890.png)
+
+
+
+## 安装 OpenEBS
+
+由于 OpenEBS 通过 iSCSI 协议提供存储支持，因此，需要在所有 Kubernetes 节点上都安装 iSCSI 客户端（启动器）。
+
+```bash
+# 安装 iscsi
+yum -y install iscsi-initiator-utils
+
+# 查看 InitiatorName 是否正常配置
+cat /etc/iscsi/initiatorname.iscsi
+
+# 启动查看状态
+systemctl enable --now iscsid
+systemctl status iscsid.service
+```
+
+直接安装：
+
+```bash
+kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+```
+
+安装完成后 Pod 如下：
+
+![image-20230506160931894](images/OpenEBS/image-20230506160931894.png "bg-black")
+
+同时还创建了以下 StorageClass：
+
+![image-20230506161107230](images/OpenEBS/image-20230506161107230.png "bg-black")
+
+默认安装完成之后只有 hostpath 和 device 两种，想要使用其它的，可以使用下面资源清单：
+
+- [OpenEBS Commons Operator](https://github.com/openebs/charts/blob/gh-pages/openebs-operator.yaml)
+- [OpenEBS cStor](https://github.com/openebs/charts/blob/gh-pages/cstor-operator.yaml)
+- [OpenEBS Jiva](https://github.com/openebs/charts/blob/gh-pages/jiva-operator.yaml)
+- [OpenEBS Hostpath](https://github.com/openebs/charts/blob/gh-pages/hostpath-operator.yaml)
+- [OpenEBS Hostpath and Device](https://github.com/openebs/charts/blob/gh-pages/openebs-operator-lite.yaml)
+- [OpenEBS LVM Local PV](https://github.com/openebs/charts/blob/gh-pages/lvm-operator.yaml)
+- [OpenEBS ZFS Local PV](https://github.com/openebs/charts/blob/gh-pages/zfs-operator.yaml)
+- [OpenEBS NFS PV](https://github.com/openebs/charts/blob/gh-pages/nfs-operator.yaml)
 
 
 
 
 
+## 测试 OpenEBS
 
+注意，通过默认资源清单安装后的 hostpath 数据存放目录为：`/var/openebs/local`，可以根据实际需求进行调整。
 
+创建测试 PVC：
 
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-openebs-hostpath
+spec:
+ # 指定类型
+  storageClassName: openebs-hostpath
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+```
 
+此时 PVC 会处于 Pending 状态，这是因为对应的 StorageClass 是延迟绑定模式，所以需要等到 Pod 消费这个 PVC 后才会去绑定。
 
+<br>
 
+创建 Pod：
 
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-demo
+spec:
+  volumes:
+    - name: web
+      persistentVolumeClaim:
+        claimName: pvc-openebs-hostpath
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+      - containerPort: 80
+    volumeMounts:
+      - name: web
+        mountPath: /usr/share/nginx/html
+```
 
+创建完成查看调度到的节点：
 
+![image-20230506164004459](images/OpenEBS/image-20230506164004459.png "bg-black")
 
+查看宿主机目录并创建用于访问测试的文件：
 
+![image-20230506164113424](images/OpenEBS/image-20230506164113424.png "bg-black")
 
+通过 Pod IP 访问 nginx 可以看到数据能够被访问。Pod 容器中的数据持久化到 Local PV 对应的目录成功。但需要注意：
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+> StorageClass 默认的数据回收策略是 Delete，所以如果将 PVC 删掉后数据会自动删除，可以通过 Velero 这样的工具来进行备份还原。
 
 
 
